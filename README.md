@@ -118,12 +118,11 @@ before distributing them.
 
 ### Prerequisites
 
-- Linux-based VS Code development container.
-- .NET 8 SDK.
-- Git with submodule support.
-- MinGW-w64 and the tools required by Unity Doorstop's xmake build.
-- A local Valheim installation copied or mounted at
-	`dependencies/valheim-steam`.
+The only local prerequisite is VS Code with the Dev Containers support. Open
+the repository in the provided devcontainer; it includes the Linux
+environment, .NET 8 SDK, Git, MinGW-w64, and the other build tools required by
+the project. The devcontainer also mounts the local Valheim installation at
+`dependencies/valheim-steam`.
 
 Initialize the pinned source dependencies:
 
