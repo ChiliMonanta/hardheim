@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <VersionPrefix>$(BepInExVersionPrefix)</VersionPrefix>
+    <VersionSuffix>$(BepInExVersionSuffix)</VersionSuffix>
+    <SourcePath>$(MSBuildThisFileDirectory)..\BepInEx\BepInEx.Preloader</SourcePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(SourcePath)\**\*.cs" Exclude="$(SourcePath)\bin\**;$(SourcePath)\obj\**" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)BepInEx.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)HarmonyXInterop.csproj" />
+    <PackageReference Include="HarmonyX" Version="2.9.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.4" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.1.29.1" />
+    <PackageReference Include="MonoMod.Utils" Version="22.1.29.1" />
+  </ItemGroup>
+  <Target Name="DeletePdbFromPublish" AfterTargets="Publish"><ItemGroup><FilesToDelete Include="$(PublishDir)*.pdb" /></ItemGroup><Delete Files="@(FilesToDelete)" /></Target>
+</Project>

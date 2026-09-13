@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <PackageId>Unity.InputSystem</PackageId>
+    <Version>1.5.0</Version>
+    <Authors>Unity</Authors>
+    <Description>Lokalt spelfilspaket för moddningsbygge.</Description>
+    <!-- Hindrar dotnet från att bygga en tom dll, vi vill bara paketera vår befintliga -->
+    <IncludeBuildOutput>false</IncludeBuildOutput> 
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="/workspace/dependencies/valheim-steam/valheim_Data/Managed/Unity.InputSystem.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib/net35;lib/net462;lib/netstandard2.0</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <VersionPrefix>$(BepInExVersionPrefix)</VersionPrefix>
+    <VersionSuffix>$(BepInExVersionSuffix)</VersionSuffix>
+    <BepInExSourcePath>$(MSBuildThisFileDirectory)..\BepInEx\BepInEx</BepInExSourcePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(BepInExSourcePath)\**\*.cs" Exclude="$(BepInExSourcePath)\bin\**;$(BepInExSourcePath)\obj\**" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)BepInEx.Harmony.csproj" ReferenceOutputAssembly="false" OutputItemType="Content" CopyToOutputDirectory="PreserveNewest" Targets="Build;DocumentationProjectOutputGroup" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)HarmonyX2Interop.csproj" ReferenceOutputAssembly="false" OutputItemType="Content" CopyToOutputDirectory="PreserveNewest" Targets="Build" />
+    <PackageReference Include="HarmonyX" Version="2.9.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.4" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.1.29.1" />
+    <PackageReference Include="MonoMod.Utils" Version="22.1.29.1" />
+    <Reference Include="UnityEngine"><HintPath>$(VALHEIM_MANAGED)\UnityEngine.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(VALHEIM_MANAGED)\UnityEngine.CoreModule.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule"><HintPath>$(VALHEIM_MANAGED)\UnityEngine.JSONSerializeModule.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(VALHEIM_MANAGED)\UnityEngine.InputLegacyModule.dll</HintPath><Private>False</Private></Reference>
+  </ItemGroup>
+  <Target Name="DeletePdbFromPublish" AfterTargets="Publish"><ItemGroup><FilesToDelete Include="$(PublishDir)*.pdb" /></ItemGroup><Delete Files="@(FilesToDelete)" /></Target>
+</Project>

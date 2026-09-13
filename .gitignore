@@ -486,12 +486,11 @@ $RECYCLE.BIN/
 # HardHeim
 dependencies/*
 !dependencies/cecil-wrapper/
-!dependencies/cecil-wrapper/Mono.Cecil.csproj
 !dependencies/harmony-wrapper/
-!dependencies/harmony-wrapper/HarmonyX.csproj
+!dependencies/bepinex-wrapper
 !dependencies/BepInEx.ConfigurationManager-wrapper/
-!dependencies/BepInEx.ConfigurationManager-wrapper/ConfigurationManager.csproj
-!dependencies/BepInEx.ConfigurationManager-wrapper/GeneratedConstants.cs
+!dependencies/valheim-unity
+!dependencies/BepInEx.Analyzers.build.targets
 dist/
 valheim-steam
 # Local Nuget

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <LangVersion>8</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>HarmonyLib</RootNamespace>
+    <AssemblyName>0Harmony20</AssemblyName>
+    <Version>2.0.0.0</Version>
+    <HarmonySourcePath>$(MSBuildThisFileDirectory)..\BepInEx\submodules\BepInEx.Harmony\HarmonyX2Interop</HarmonySourcePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(HarmonySourcePath)\**\*.cs" Exclude="$(HarmonySourcePath)\bin\**;$(HarmonySourcePath)\obj\**" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)HarmonyXInterop.csproj" />
+  </ItemGroup>
+  <Target Name="HarmonyXAlias" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <ItemGroup>
+      <ReferencePath Condition="'%(ReferencePath.NuGetPackageId)' == 'HarmonyX'">
+        <Aliases>hx</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
+</Project>

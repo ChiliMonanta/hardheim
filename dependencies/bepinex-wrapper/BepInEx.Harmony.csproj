@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>2.0.0.0</Version>
+    <HarmonySourcePath>$(MSBuildThisFileDirectory)..\BepInEx\submodules\BepInEx.Harmony\BepInEx.Harmony</HarmonySourcePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(HarmonySourcePath)\**\*.cs" Exclude="$(HarmonySourcePath)\bin\**;$(HarmonySourcePath)\obj\**;$(HarmonySourcePath)\Attributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BepInExHarmonyAttributes.cs" />
+    <PackageReference Include="HarmonyX" Version="2.9.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

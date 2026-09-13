@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'BepInEx.Analyzers'">
+    <PackageId>BepInEx.Analyzers.Core</PackageId>
+  </PropertyGroup>
+</Project>
