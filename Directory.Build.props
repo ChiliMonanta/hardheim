@@ -1,0 +1,12 @@
+<Project>
+  <!-- Forces all sub-projects to inherit the root nuget.config -->
+  <PropertyGroup>
+    <RestoreConfigFile>$(MSBuildThisFileDirectory)nuget.config</RestoreConfigFile>
+  </PropertyGroup>
+
+  <!-- Valheim and Unity dependencies, point directly instead of using local nuget (too many files) -->
+  <PropertyGroup>
+    <ValheimDir>/workspace/dependencies/valheim-steam/valheim_Data/Managed</ValheimDir>
+  </PropertyGroup>
+</Project>
+

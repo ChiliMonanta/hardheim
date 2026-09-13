@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectGuid>{D68133BD-1E63-496E-9EDE-4FBDBF77B486}</ProjectGuid>
+    <RootNamespace>Mono.Cecil</RootNamespace>
+    <AssemblyName>Mono.Cecil</AssemblyName>
+    <PackageId>Mono.Cecil</PackageId>
+
+    <TargetFramework>net462</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CecilSourcePath>$(MSBuildThisFileDirectory)..\cecil</CecilSourcePath>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(CecilSourcePath)/cecil.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(CecilSourcePath)/ProjectInfo.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono/*.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono.Cecil/*.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono.Cecil.Cil/*.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono.Cecil.Metadata/*.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono.Cecil.PE/*.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono.Collections.Generic/*.cs" />
+    <Compile Include="$(CecilSourcePath)/Mono.Security.Cryptography/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net462" Version="1.0.3" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

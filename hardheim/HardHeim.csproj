@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>HardHeim</AssemblyName>
+    <RootNamespace>HardHeim</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <!-- 
+      Suppress internal MSBuild reference warnings:
+      - MSB3245: Missing Unity modules (e.g., XR/VR) referenced by Jötunn but not required by this mod.
+      - MSB3243: Version conflicts between Jötunn's NuGet packages and the game's native Unity DLLs.
+      - MSB3277: Hidden internal dependencies required by assembly_valheim.dll (resolved by BepInEx at runtime).
+    -->
+    <MSBuildWarningsAsMessages>MSB3245;MSB3277;MSB3243</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx" Version="5.4.23.3" />
+    <PackageReference Include="JotunnLib" Version="2.30.0" />
+    <Reference  Include="UnityEngine">
+      <HintPath>$(ValheimDir)/UnityEngine.dll</HintPath>
+    </Reference >
+    <Reference  Include="UnityEngine.CoreModule">
+      <HintPath>$(ValheimDir)/UnityEngine.CoreModule.dll</HintPath>
+    </Reference >
+    <Reference  Include="assembly_valheim">
+      <HintPath>$(ValheimDir)/assembly_valheim.dll</HintPath>
+    </Reference >
+  </ItemGroup>
+
+</Project>

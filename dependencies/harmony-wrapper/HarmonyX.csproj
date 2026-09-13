@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>HarmonyLib</RootNamespace>
+    <AssemblyName>0Harmony</AssemblyName>
+    <TargetFramework>net462</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Product>HarmonyX</Product>
+    <Company>BepInEx</Company>
+    <Copyright>Copyright © BepInEx 2022</Copyright>
+    <Description>A library for patching, replacing and decorating .NET and Mono methods during runtime powered by MonoMod.</Description>
+    <PackageId>HarmonyX</PackageId>
+    <Authors>Andreas Pardeike, Geoffrey Horsington, ManlyMarco et al.</Authors>
+    <SignAssembly>true</SignAssembly>
+    <Version>2.9.0</Version>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/BepInEx/HarmonyX</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>Harmony,Mono,Patch,Patching,Runtime,Detour,Detours,Aspect,Aspects</PackageTags>
+    <AssemblyVersion>2.9.0.0</AssemblyVersion>
+    <FileVersion>2.9.0.0</FileVersion>
+    <PackageIcon>logo_mini.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/BepInEx/HarmonyX/master/logo_mini.png</PackageIconUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>HarmonyLib</RootNamespace>
+    <HarmonySourcePath>$(MSBuildThisFileDirectory)..\HarmonyX\Harmony</HarmonySourcePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(HarmonySourcePath)\**\*.cs" Exclude="$(HarmonySourcePath)\bin\**;$(HarmonySourcePath)\obj\**" />
+    <None Include="$(HarmonySourcePath)\..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="$(HarmonySourcePath)\..\logo_mini.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="$(HarmonySourcePath)\..\README.md" Pack="false" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.1.29.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+</Project>

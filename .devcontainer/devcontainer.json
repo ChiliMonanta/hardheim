@@ -1,0 +1,26 @@
+{
+    "name": "Valheim Mod Development (.NET)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "mounts": [
+        "type=bind,source=c:/Program Files (x86)/Steam/steamapps/common/Valheim,target=/workspace/dependencies/valheim-steam"
+    ],
+    "remoteUser": "dotnet",
+    "runArgs": [
+        "--security-opt=no-new-privileges:true",
+        "--cap-drop=all"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csharp",
+                "ms-dotnettools.vscode-dotnet-runtime",
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools"
+            ]
+        }
+    },
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+}

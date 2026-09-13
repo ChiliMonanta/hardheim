@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <RootNamespace>ConfigurationManager</RootNamespace>
+    <AssemblyName>ConfigurationManager</AssemblyName>
+    <PackageId>BepInEx.ConfigurationManager</PackageId>
+    <Version>19.0.0</Version>
+    <OutputPath>bin\BepInEx5</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>TRACE;Mono</DefineConstants>
+    <Optimize>true</Optimize>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\BepInEx.ConfigurationManager\ConfigurationManager.Shared\**\*.cs" />
+    <Compile Include="..\BepInEx.ConfigurationManager\ConfigurationManager\SettingSearcher.cs" />
+    <Compile Include="..\BepInEx.ConfigurationManager\ConfigurationManagerAttributes.cs" />
+    <Compile Include="GeneratedConstants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>..\bepinex-wrapper\bin\Release\net462\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>..\bepinex-wrapper\bin\Release\net462\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="HarmonyXInterop">
+      <HintPath>..\bepinex-wrapper\bin\Release\net462\HarmonyXInterop.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\bepinex-wrapper\bin\Release\net462\Mono.Cecil.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>..\bepinex-wrapper\bin\Release\net462\MonoMod.RuntimeDetour.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\bepinex-wrapper\bin\Release\net462\MonoMod.Utils.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>$(NuGetPackageRoot)unity.inputsystem\1.5.0\lib\net462\Unity.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(NuGetPackageRoot)unityengine\5.6.1\lib\net462\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(NuGetPackageRoot)unityengine.coremodule\5.6.1\lib\net462\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(NuGetPackageRoot)unityengine.imguimodule\5.6.1\lib\net462\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(NuGetPackageRoot)unityengine.textrenderingmodule\5.6.1\lib\net462\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
