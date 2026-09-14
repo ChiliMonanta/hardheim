@@ -4,8 +4,9 @@ HardHeim is a Valheim mod built with BepInEx and Jötunn. Its purpose is to
 make survival more demanding by changing gameplay rules that are normally
 fixed in vanilla Valheim.
 
-The current implementation focuses on mining progression: the weight of
-copper ore can be configured by the server. The configuration is synchronized
+The current implementation focuses on mining progression and death penalties:
+the weight of copper ore can be configured by the server, and skill loss on
+death is adjusted for higher skill levels. The configuration is synchronized
 to clients, and all players are required to have the mod installed.
 
 Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim/p/Dudes/HardHeim/).
@@ -13,6 +14,7 @@ Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim
 ## Current Features
 
 - Configurable copper ore weight.
+- Custom death penalty scaling based on skill level.
 - Server-side configuration synchronization through Jötunn.
 - Network compatibility requiring the mod on every client.
 - Configuration Manager support through the local development packages.
@@ -25,7 +27,8 @@ BepInEx/config/com.valheim.heavyminer.cfg
 ```
 
 The configuration value is named `CopperOre` and accepts values from `0.1` to
-`1000`.
+`1000`. Death penalty behavior is currently built in and has no separate
+configuration option.
 
 ## Architecture
 
