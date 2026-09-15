@@ -86,6 +86,20 @@ public class HardHeim : BaseUnityPlugin
         harmony?.UnpatchSelf();
     }
 
+    [HarmonyPatch(typeof(Player), "FixedUpdate")]
+    public static class CryptEntryPatch
+    {
+        private static void Postfix()
+        {
+            if (EnvMan.instance != null)
+            {
+                CryptEnvironmentPatch.Refresh(EnvMan.instance);
+            }
+        }
+    }
+
+    #endregion
+
     #endregion
 
     #region Death penalty
@@ -153,22 +167,25 @@ public class HardHeim : BaseUnityPlugin
 
         static void Postfix(EnvMan __instance)
         {
-            if (EnvMan.instance == null || Player.m_localPlayer == null)
+            Refresh(__instance);
+        }
+
+        public static void Refresh(EnvMan environmentManager)
+        {
+            if (environmentManager == null || Player.m_localPlayer == null)
             {
                 RestoreLighting();
                 return;
             }
 
-            bool isDarkDungeon = Player.m_localPlayer.InInterior();
-
-            if (!isDarkDungeon)
+            if (!Player.m_localPlayer.InInterior())
             {
                 RestoreLighting();
                 return;
             }
 
             IsDarkDungeon = true;
-            ApplyEnvironmentDarkness(EnvMan.instance.GetCurrentEnvironment());
+            ApplyEnvironmentDarkness(environmentManager.GetCurrentEnvironment());
             ApplyDarkness();
             DungeonLightPatch.DisableDungeonLights();
             PlayerLightPatch.BoostPlayerLights();
@@ -328,8 +345,8 @@ public class HardHeim : BaseUnityPlugin
     // Makes the local player's torch more useful in the forced darkness.
     public static class PlayerLightPatch
     {
-        private const float IntensityMultiplier = 4f;
-        private const float RangeMultiplier = 3f;
+        private const float IntensityMultiplier = 0.25f;
+        private const float RangeMultiplier = 0.8f;
         private static readonly Dictionary<Light, LightSettings> originalLights = new();
 
         public static void BoostPlayerLights()
@@ -359,7 +376,10 @@ public class HardHeim : BaseUnityPlugin
 
         public static void BoostAttachedLights(Component component)
         {
-            if (!CryptEnvironmentPatch.IsDarkDungeon || component == null)
+            if (!CryptEnvironmentPatch.IsDarkDungeon
+                || component == null
+                || Player.m_localPlayer == null
+                || !component.transform.IsChildOf(Player.m_localPlayer.transform))
             {
                 return;
             }
