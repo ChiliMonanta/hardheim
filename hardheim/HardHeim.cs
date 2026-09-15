@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -74,11 +76,21 @@ public class HardHeim : BaseUnityPlugin
 
         copperOre.m_itemData.m_shared.m_weight = copperOreWeight.Value;
         Logger.LogInfo($"Copper ore weight set to {copperOreWeight.Value}.");
+
+        var surtlingCore = PrefabManager.Cache.GetPrefab<ItemDrop>("SurtlingCore");
+        if (surtlingCore == null)
+        {
+            Logger.LogError("Could not find the SurtlingCore prefab.");
+            return;
+        }
+
+        surtlingCore.m_itemData.m_shared.m_weight = surtlingCoreWeight.Value;
+        Logger.LogInfo($"Surtling core weight set to {surtlingCoreWeight.Value}.");
     }
 
     private void OnConfigurationSynchronized(object sender, ConfigurationSynchronizationEventArgs args)
     {
-        SetCopperOreWeight();
+        SetItemWeights();
     }
 
     private void OnDestroy()
@@ -99,6 +111,49 @@ public class HardHeim : BaseUnityPlugin
     }
 
     #endregion
+
+    #region Crypt loot
+
+    [HarmonyPatch]
+    public static class CryptLootPatch
+    {
+        private static IEnumerable<MethodBase> TargetMethods()
+        {
+            return typeof(DungeonGenerator)
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(method => method.Name == nameof(DungeonGenerator.Generate));
+        }
+
+        private static void Postfix(DungeonGenerator __instance)
+        {
+            var surtlingCore = PrefabManager.Cache.GetPrefab<ItemDrop>("SurtlingCore");
+            if (surtlingCore == null)
+            {
+                return;
+            }
+
+            var inventories = __instance.GetComponentsInChildren<Container>(true)
+                .Select(container => container.GetInventory())
+                .Where(inventory => inventory != null)
+                .ToList();
+            var coreItems = inventories
+                .SelectMany(inventory => inventory.GetAllItems())
+                .Where(item => item.m_dropPrefab == surtlingCore.gameObject)
+                .ToList();
+
+            foreach (var coreItem in coreItems)
+            {
+                coreItem.m_stack = 0;
+            }
+
+            if (UnityEngine.Random.Range(0, 2) == 0 || inventories.Count == 0)
+            {
+                return;
+            }
+
+            inventories[UnityEngine.Random.Range(0, inventories.Count)].AddItem(surtlingCore.gameObject, 1);
+        }
+    }
 
     #endregion
 
@@ -409,13 +464,8 @@ public class HardHeim : BaseUnityPlugin
 
         private static bool IsPlayerLight(Light light)
         {
-            if (light.transform.IsChildOf(Player.m_localPlayer.transform))
-            {
-                return true;
-            }
-
-            // Some held items are spawned beside the player rather than below the player object.
-            return Vector3.Distance(light.transform.position, Player.m_localPlayer.transform.position) <= 3f;
+            return Player.m_localPlayer != null
+                && light.transform.IsChildOf(Player.m_localPlayer.transform);
         }
 
         public static void RestorePlayerLights()
