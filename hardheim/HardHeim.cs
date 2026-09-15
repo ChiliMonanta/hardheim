@@ -21,6 +21,7 @@ public class HardHeim : BaseUnityPlugin
     public const string PluginVersion = "0.0.3";
 
     private ConfigEntry<float> copperOreWeight;
+    private ConfigEntry<float> surtlingCoreWeight;
     private static Harmony harmony;
 
     #region Plugin lifecycle and configuration
@@ -36,16 +37,33 @@ public class HardHeim : BaseUnityPlugin
                 new AcceptableValueRange<float>(0.1f, 1000f),
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
+        surtlingCoreWeight = Config.Bind(
+            "Ore Weights",
+            "SurtlingCore",
+            200f,
+            new ConfigDescription(
+                "Weight of one surtling core.",
+                new AcceptableValueRange<float>(0.1f, 1000f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
         harmony = new Harmony(PluginGUID);
-        harmony.PatchAll();
+        try
+        {
+            harmony.PatchAll();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError($"Failed to install Harmony patches: {exception}");
+            throw;
+        }
 
         Logger.LogInfo($"{PluginName} started.");
         Jotunn.Logger.LogInfo($"{PluginName} started through Jotunn.");
-        ItemManager.OnItemsRegistered += SetCopperOreWeight;
+        ItemManager.OnItemsRegistered += SetItemWeights;
         SynchronizationManager.OnConfigurationSynchronized += OnConfigurationSynchronized;
     }
 
-    private void SetCopperOreWeight()
+    private void SetItemWeights()
     {
         var copperOre = PrefabManager.Cache.GetPrefab<ItemDrop>("CopperOre");
         if (copperOre == null)
