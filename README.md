@@ -18,6 +18,8 @@ Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim
 - Server-side configuration synchronization through Jötunn.
 - Network compatibility requiring the mod on every client.
 - Configuration Manager support through the local development packages.
+- Camera zoom can affect the perceived brightness and range of handheld lights
+	because Valheim adjusts light detail based on camera distance.
 
 The default copper ore weight is `50`. The generated BepInEx configuration can
 be changed after the first launch:

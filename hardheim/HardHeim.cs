@@ -1,9 +1,13 @@
+using System;
+using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using Jotunn;
 using Jotunn.Managers;
 using Jotunn.Utils;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace HardHeim;
 
@@ -14,10 +18,12 @@ public class HardHeim : BaseUnityPlugin
 {
     public const string PluginGUID = "com.valheim.hardheim";
     public const string PluginName = "HardHeim";
-    public const string PluginVersion = "0.0.2";
+    public const string PluginVersion = "0.0.3";
 
     private ConfigEntry<float> copperOreWeight;
     private static Harmony harmony;
+
+    #region Plugin lifecycle and configuration
 
     private void Awake()
     {
@@ -62,6 +68,11 @@ public class HardHeim : BaseUnityPlugin
         harmony?.UnpatchSelf();
     }
 
+    #endregion
+
+    #region Death penalty
+
+    // Replaces Valheim's default skill loss with level-based penalties.
     [HarmonyPatch(typeof(Skills), nameof(Skills.LowerAllSkills))]
     public static class DeathPenaltyPatch
     {
@@ -90,8 +101,352 @@ public class HardHeim : BaseUnityPlugin
                 return UnityEngine.Mathf.Max(0f, currentLevel - 2f);
             }
 
-            // Default Valheim penaulty, percentage
+            // Use Valheim's default percentage-based penalty below level 50.
             return currentLevel * (1f - factor);
         }
     }
+
+    #endregion
+
+    #region Dungeon darkness
+
+    // Applies black ambient lighting and overrides Valheim's environment lighting indoors.
+    [HarmonyPatch(typeof(EnvMan), "UpdateEnvironment")]
+    public static class CryptEnvironmentPatch
+    {
+        public static bool IsDarkDungeon { get; private set; }
+        private static bool darknessApplied;
+        private static AmbientMode originalAmbientMode;
+        private static SphericalHarmonicsL2 originalAmbientProbe;
+        private static Color originalAmbientLight;
+        private static float originalAmbientIntensity;
+        private static float originalReflectionIntensity;
+        private static Color originalFogColor;
+        private static float originalFogDensity;
+        private static EnvSetup darkEnvironment;
+        private static Color originalEnvironmentAmbientColorDay;
+        private static Color originalEnvironmentAmbientColorNight;
+        private static float originalEnvironmentLightIntensityDay;
+        private static float originalEnvironmentLightIntensityNight;
+        private static Color originalEnvironmentFogColorDay;
+        private static Color originalEnvironmentFogColorNight;
+        private static float originalEnvironmentFogDensityDay;
+        private static float originalEnvironmentFogDensityNight;
+
+        static void Postfix(EnvMan __instance)
+        {
+            if (EnvMan.instance == null || Player.m_localPlayer == null)
+            {
+                RestoreLighting();
+                return;
+            }
+
+            bool isDarkDungeon = Player.m_localPlayer.InInterior();
+
+            if (!isDarkDungeon)
+            {
+                RestoreLighting();
+                return;
+            }
+
+            IsDarkDungeon = true;
+            ApplyEnvironmentDarkness(EnvMan.instance.GetCurrentEnvironment());
+            ApplyDarkness();
+            DungeonLightPatch.DisableDungeonLights();
+            PlayerLightPatch.BoostPlayerLights();
+        }
+
+        private static void ApplyEnvironmentDarkness(EnvSetup environment)
+        {
+            if (environment == null || darkEnvironment == environment)
+            {
+                return;
+            }
+
+            RestoreEnvironmentLighting();
+            darkEnvironment = environment;
+            originalEnvironmentAmbientColorDay = environment.m_ambColorDay;
+            originalEnvironmentAmbientColorNight = environment.m_ambColorNight;
+            originalEnvironmentLightIntensityDay = environment.m_lightIntensityDay;
+            originalEnvironmentLightIntensityNight = environment.m_lightIntensityNight;
+            originalEnvironmentFogColorDay = environment.m_fogColorDay;
+            originalEnvironmentFogColorNight = environment.m_fogColorNight;
+            originalEnvironmentFogDensityDay = environment.m_fogDensityDay;
+            originalEnvironmentFogDensityNight = environment.m_fogDensityNight;
+
+            environment.m_ambColorDay = Color.black;
+            environment.m_ambColorNight = Color.black;
+            environment.m_lightIntensityDay = 0f;
+            environment.m_lightIntensityNight = 0f;
+            environment.m_fogColorDay = Color.black;
+            environment.m_fogColorNight = Color.black;
+            environment.m_fogDensityDay = 1f;
+            environment.m_fogDensityNight = 1f;
+        }
+
+        private static void ApplyDarkness()
+        {
+            if (!darknessApplied)
+            {
+                originalAmbientMode = RenderSettings.ambientMode;
+                originalAmbientProbe = RenderSettings.ambientProbe;
+                originalAmbientLight = RenderSettings.ambientLight;
+                originalAmbientIntensity = RenderSettings.ambientIntensity;
+                originalReflectionIntensity = RenderSettings.reflectionIntensity;
+                originalFogColor = RenderSettings.fogColor;
+                originalFogDensity = RenderSettings.fogDensity;
+                darknessApplied = true;
+            }
+
+            // Remove ambient and reflection light so dungeon walls do not glow.
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            RenderSettings.ambientLight = Color.black;
+            RenderSettings.ambientIntensity = 0f;
+            RenderSettings.ambientProbe = new SphericalHarmonicsL2();
+            RenderSettings.reflectionIntensity = 0f;
+
+            // Keep fog from adding a gray glow to the scene.
+            RenderSettings.fogColor = Color.black;
+            RenderSettings.fogDensity = 0.1f;
+        }
+
+        private static void RestoreLighting()
+        {
+            if (!darknessApplied)
+            {
+                return;
+            }
+
+            RenderSettings.ambientMode = originalAmbientMode;
+            RenderSettings.ambientProbe = originalAmbientProbe;
+            RenderSettings.ambientLight = originalAmbientLight;
+            RenderSettings.ambientIntensity = originalAmbientIntensity;
+            RenderSettings.reflectionIntensity = originalReflectionIntensity;
+            RenderSettings.fogColor = originalFogColor;
+            RenderSettings.fogDensity = originalFogDensity;
+            RestoreEnvironmentLighting();
+            PlayerLightPatch.RestorePlayerLights();
+            darknessApplied = false;
+            IsDarkDungeon = false;
+        }
+
+        private static void RestoreEnvironmentLighting()
+        {
+            if (darkEnvironment == null)
+            {
+                return;
+            }
+
+            darkEnvironment.m_ambColorDay = originalEnvironmentAmbientColorDay;
+            darkEnvironment.m_ambColorNight = originalEnvironmentAmbientColorNight;
+            darkEnvironment.m_lightIntensityDay = originalEnvironmentLightIntensityDay;
+            darkEnvironment.m_lightIntensityNight = originalEnvironmentLightIntensityNight;
+            darkEnvironment.m_fogColorDay = originalEnvironmentFogColorDay;
+            darkEnvironment.m_fogColorNight = originalEnvironmentFogColorNight;
+            darkEnvironment.m_fogDensityDay = originalEnvironmentFogDensityDay;
+            darkEnvironment.m_fogDensityNight = originalEnvironmentFogDensityNight;
+            darkEnvironment = null;
+        }
+    }
+
+    #endregion
+
+    #region Dungeon light cleanup
+
+    // Disables dungeon light sources and their fire or smoke particles.
+    public static class DungeonLightPatch
+    {
+        public static void DisableDungeonLights()
+        {
+            foreach (var light in UnityEngine.Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            {
+                DisableDungeonLight(light);
+            }
+        }
+
+        private static void DisableDungeonLight(Light light)
+        {
+            if (light == null || !IsDungeonLight(light))
+            {
+                return;
+            }
+
+            light.enabled = false;
+            light.intensity = 0f;
+
+            foreach (var particleSystem in light.transform.root.GetComponentsInChildren<ParticleSystem>())
+            {
+                particleSystem.Stop();
+                particleSystem.Clear();
+            }
+        }
+
+        public static bool IsDungeonLight(Light light)
+        {
+            string rootName = light.transform.root.name.ToLowerInvariant();
+            if (rootName.Contains("player") || rootName.Contains("character"))
+            {
+                return false;
+            }
+
+            string objectName = light.gameObject.name.ToLowerInvariant();
+            return rootName.Contains("torch")
+                || rootName.Contains("sconce")
+                || rootName.Contains("brazier")
+                || rootName.Contains("fire")
+                || rootName.Contains("flame")
+                || objectName.Contains("torch")
+                || objectName.Contains("sconce")
+                || objectName.Contains("brazier")
+                || objectName.Contains("fire")
+                || objectName.Contains("flame");
+        }
+    }
+
+    #endregion
+
+    #region Player torch boost
+
+    // Makes the local player's torch more useful in the forced darkness.
+    public static class PlayerLightPatch
+    {
+        private const float IntensityMultiplier = 4f;
+        private const float RangeMultiplier = 3f;
+        private static readonly Dictionary<Light, LightSettings> originalLights = new();
+
+        public static void BoostPlayerLights()
+        {
+            if (Player.m_localPlayer == null)
+            {
+                return;
+            }
+
+            foreach (var light in UnityEngine.Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            {
+                if (DungeonLightPatch.IsDungeonLight(light) || !IsPlayerLight(light))
+                {
+                    continue;
+                }
+
+                if (!originalLights.ContainsKey(light))
+                {
+                    originalLights[light] = new LightSettings(light.intensity, light.range);
+                }
+
+                var original = originalLights[light];
+                light.intensity = original.Intensity * IntensityMultiplier;
+                light.range = original.Range * RangeMultiplier;
+            }
+        }
+
+        public static void BoostAttachedLights(Component component)
+        {
+            if (!CryptEnvironmentPatch.IsDarkDungeon || component == null)
+            {
+                return;
+            }
+
+            foreach (var light in component.GetComponentsInChildren<Light>(true))
+            {
+                if (DungeonLightPatch.IsDungeonLight(light))
+                {
+                    continue;
+                }
+
+                BoostLight(light);
+            }
+        }
+
+        private static void BoostLight(Light light)
+        {
+            if (!originalLights.ContainsKey(light))
+            {
+                originalLights[light] = new LightSettings(light.intensity, light.range);
+            }
+
+            var original = originalLights[light];
+            light.intensity = original.Intensity * IntensityMultiplier;
+            light.range = original.Range * RangeMultiplier;
+        }
+
+        private static bool IsPlayerLight(Light light)
+        {
+            if (light.transform.IsChildOf(Player.m_localPlayer.transform))
+            {
+                return true;
+            }
+
+            // Some held items are spawned beside the player rather than below the player object.
+            return Vector3.Distance(light.transform.position, Player.m_localPlayer.transform.position) <= 3f;
+        }
+
+        public static void RestorePlayerLights()
+        {
+            foreach (var entry in originalLights)
+            {
+                if (entry.Key == null)
+                {
+                    continue;
+                }
+
+                entry.Key.intensity = entry.Value.Intensity;
+                entry.Key.range = entry.Value.Range;
+            }
+
+            originalLights.Clear();
+        }
+
+        private readonly struct LightSettings
+        {
+            public LightSettings(float intensity, float range)
+            {
+                Intensity = intensity;
+                Range = range;
+            }
+
+            public float Intensity { get; }
+            public float Range { get; }
+        }
+    }
+
+    #endregion
+
+    #region Light reactivation guard
+
+    // Dvergr lanterns expose their light through these components instead of the player hierarchy.
+    [HarmonyPatch(typeof(LightFlicker), "Awake")]
+    public static class LightFlickerPatch
+    {
+        static void Postfix(LightFlicker __instance)
+        {
+            PlayerLightPatch.BoostAttachedLights(__instance);
+        }
+    }
+
+    [HarmonyPatch(typeof(ParticleIntensityScaler), "Start")]
+    public static class ParticleLightPatch
+    {
+        static void Postfix(ParticleIntensityScaler __instance)
+        {
+            PlayerLightPatch.BoostAttachedLights(__instance);
+        }
+    }
+
+    // Prevents Valheim from turning dungeon lights back on after they are disabled.
+    [HarmonyPatch(typeof(Behaviour), "set_enabled")]
+    public static class DungeonLightEnabledPatch
+    {
+        static void Prefix(Behaviour __instance, ref bool value)
+        {
+            if (value && CryptEnvironmentPatch.IsDarkDungeon
+                && __instance is Light light
+                && DungeonLightPatch.IsDungeonLight(light))
+            {
+                value = false;
+            }
+        }
+    }
+
+    #endregion
+
 }

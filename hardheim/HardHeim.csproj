@@ -4,7 +4,7 @@
     <TargetFramework>net462</TargetFramework>
     <OutputType>Library</OutputType>
     <AssemblyName>HardHeim</AssemblyName>
-    <VersionPrefix>0.0.2</VersionPrefix>
+    <VersionPrefix>0.0.3</VersionPrefix>
     <RootNamespace>HardHeim</RootNamespace>
     <LangVersion>latest</LangVersion>
     <!-- 
@@ -26,6 +26,9 @@
     <Reference  Include="UnityEngine.CoreModule">
       <HintPath>$(ValheimDir)/UnityEngine.CoreModule.dll</HintPath>
     </Reference >
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>$(ValheimDir)/UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
     <Reference  Include="assembly_valheim">
       <HintPath>$(ValheimDir)/assembly_valheim.dll</HintPath>
     </Reference >

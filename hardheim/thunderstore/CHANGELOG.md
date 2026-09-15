@@ -1,3 +1,8 @@
+## v0.0.3
+- **Crypt Darkness:** Crypts and caves now use black ambient lighting and fog, removing environmental light that can reveal the interior without a light source.
+- **Dungeon Light Removal:** Dungeon torches, sconces, braziers, and related particle effects are disabled and prevented from reactivating.
+- **Player Light Boost:** Handheld torches and Dvergr lanterns receive increased intensity and range so they remain useful in the forced darkness.
+
 ## v0.0.2
 - **Custom Death Penalty:** Added level-based skill loss when a player dies.
 - **Penalty Scaling:** Skills below level 50 use percentage-based loss, skills
