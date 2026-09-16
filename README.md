@@ -4,33 +4,28 @@ HardHeim is a Valheim mod built with BepInEx and Jötunn. Its purpose is to
 make survival more demanding by changing gameplay rules that are normally
 fixed in vanilla Valheim.
 
-The current implementation focuses on mining progression and death penalties:
-the weight of copper ore can be configured by the server, and skill loss on
-death is adjusted for higher skill levels. The configuration is synchronized
-to clients, and all players are required to have the mod installed.
+The current implementation focuses on progression pacing and atmosphere:
+- Surtling Core scarcity in Burial Chambers (0 or 1 per crypt) to lengthen and intensify the early game.
+- Configurable weights for Copper Ore and Surtling Cores.
+- Custom death penalty scaling based on skill level.
+- Pitch-black dungeons and crypts requiring handheld light sources.
 
 Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim/p/Dudes/HardHeim/).
 
 ## Current Features
 
-- Configurable copper ore weight.
-- Custom death penalty scaling based on skill level.
-- Server-side configuration synchronization through Jötunn.
-- Network compatibility requiring the mod on every client.
-- Configuration Manager support through the local development packages.
-- Camera zoom can affect the perceived brightness and range of handheld lights
-	because Valheim adjusts light detail based on camera distance.
+- **Copper Ore Weight:** Configurable copper ore weight on the server (default `50`).
+- **Surtling Core Weight:** Configurable Surtling Core weight on the server (default `150`).
+- **Crypt Surtling Core Scarcity:** Burial Chambers contain 0 or 1 Surtling Core total based on a configurable chance (default `30%`).
+- **Custom Death Penalty:** Skill loss scaled by level.
+- **Dark Crypts & Caves:** Forced darkness indoors with tuned handheld lighting.
+- **Server Synchronization:** Jötunn-managed server-to-client config synchronization and version enforcement.
 
-The default copper ore weight is `50`. The generated BepInEx configuration can
-be changed after the first launch:
+The generated BepInEx configuration can be adjusted in:
 
 ```text
-BepInEx/config/com.valheim.heavyminer.cfg
+BepInEx/config/com.valheim.hardheim.cfg
 ```
-
-The configuration value is named `CopperOre` and accepts values from `0.1` to
-`1000`. Death penalty behavior is currently built in and has no separate
-configuration option.
 
 ## Architecture
 
