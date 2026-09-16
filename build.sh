@@ -261,11 +261,17 @@ dotnet pack "$CONFIGURATION_MANAGER_WRAPPER_PATH/ConfigurationManager.csproj" \
 #-------------------
 echo "# Build Jotunn"
 JONTUNN_PATH="$DEPS_PATH/Jotunn"
+JOTUNN_VERSION=2.30.0
 
 clean_build_files "$JONTUNN_PATH"
 
 # Jontunn has a prebuild step that requires the Mono.Cecil.dll, don't use the checked in one.
 cp .locals-packages/Mono.Cecil.dll $DEPS_PATH/Jotunn/libraries
+
+# The pinned v2.30.0 source still declares its BepInEx runtime version as 2.29.2.
+# Synchronize it with the version used for the assembly and distribution package.
+sed -i -E 's/(public const string Version = ")[^"]+/\1'"$JOTUNN_VERSION"'/' \
+  "$JONTUNN_PATH/JotunnLib/Main.cs"
 
 dotnet build "$DEPS_PATH/Jotunn/JotunnBuildTask/JotunnBuildTask.csproj" \
   -c Release \
@@ -277,7 +283,7 @@ dotnet build "$DEPS_PATH/Jotunn/JotunnBuildTask/JotunnBuildTask.csproj" \
 dotnet build "$DEPS_PATH/Jotunn/JotunnLib.sln" \
   -c Release \
   -p:DefineConstants=$CECIL_DEFINES \
-  -p:Version=2.30.0 \
+  -p:Version=$JOTUNN_VERSION \
   -p:ExecutePrebuild=true \
   -p:CecilVersion=$CECIL_VERSION \
   -p:PackageOutputPath="$LOCAL_PACKAGES_PATH"
@@ -373,7 +379,7 @@ cp $DEPS_PATH/Jotunn/JotunnLib/bin/Release/net462/Jotunn.dll dist/tmp/BepInEx/pl
 cat << 'EOF' > dist/tmp/BepInEx/plugins/manifest.json
 {
     "name": "Jotunn",
-    "version_number": "2.30.0",
+  "version_number": "$JOTUNN_VERSION",
     "website_url": "",
     "description": "Jotunn is a modding library for Valheim.",
     "dependencies": [
