@@ -29,8 +29,8 @@ if [ ! -d "$DEPS_PATH/MonoMod" ]; then
     echo "📦 Cloning MonoMod..."
     git -C "$DEPS_PATH" clone https://github.com/MonoMod/MonoMod.git
     (cd $DEPS_PATH/MonoMod && \
-    git checkout 68cf23127bd2394004e8a812b160a0862c95a309 && \
-    git submodule update --init --recursive ) # v22.01.29.01
+    git checkout --detach 68cf23127bd2394004e8a812b160a0862c95a309 && \
+    git submodule update --init --recursive) # v22.01.29.01
     clean_build_files "$DEPS_PATH/MonoMod"
 else
     echo "✅ MonoMod already installed."
@@ -53,8 +53,8 @@ if [ ! -d "$DEPS_PATH/BepInEx" ]; then
     # Vi klonar specifikt v5-lts branch och drar med HarmonyX, MonoMod osv automatiskt via --recursive
     git -C "$DEPS_PATH" clone https://github.com/AzumattDev/BepInEx.git
     (cd $DEPS_PATH/BepInEx && \
-    git checkout 831cbaf6f38203895ecbd54af10c10d668cfef3c && \
-    git submodule update --init --recursive) # v5.4.2333
+    git checkout --detach ef506e0a6bb98c49d85b7927b5ab625605826be0 && \
+    git submodule update --init --recursive) # v5.4.2350
     clean_build_files "$DEPS_PATH/BepInEx"
 else
     echo "✅ BepInEx already installed."
@@ -91,12 +91,12 @@ else
     echo "✅ Jotunn already installed."
 fi
 
-# Clone UnityDoorstop v4.4.0 for Windows/Valheim
+# Clone UnityDoorstop v4.5.0 for Windows/Valheim
 if [ ! -d "$DEPS_PATH/UnityDoorstop" ]; then
     echo "📦 Cloning UnityDoorstop..."
-    git -C "$DEPS_PATH" clone https://github.com/NeighTools/UnityDoorstop.git 
+    git -C "$DEPS_PATH" clone https://github.com/NeighTools/UnityDoorstop.git
     (cd $DEPS_PATH/UnityDoorstop && \
-    git checkout --detach 851712bfef21c90e01c951e024609e76716d55f9) # v4.4.0
+    git checkout --detach 33dab9a6733862eb81869ff08431d9478b28784b) # v4.5.0
     clean_build_files "$DEPS_PATH/UnityDoorstop"
 else
     echo "✅ UnityDoorstop already installed."

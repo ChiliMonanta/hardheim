@@ -38,7 +38,7 @@ The runtime dependency chain is:
 
 ```text
 HardHeim
-├── BepInEx 5.4.23.3
+├── BepInEx 5.4.23.5
 ├── Jötunn 2.30.0
 │   └── YamlDotNet and JotunnBuildTask dependencies
 ├── UnityEngine assemblies from the local Valheim installation
@@ -196,7 +196,7 @@ package and are not modified by the HardHeim deployment step.
 The Thunderstore package metadata is maintained in
 `hardheim/thunderstore/manifest.json`. Its declared dependencies are:
 
-- `denikson-BepInExPack_Valheim-5.4.2333`
+- `denikson-BepInExPack_Valheim-5.4.2350`
 - `ValheimModding-Jotunn-2.30.0`
 
 For end users, BepInEx must already be installed in the Valheim directory.

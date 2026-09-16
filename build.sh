@@ -126,7 +126,7 @@ dotnet pack "$DEPS_PATH/harmony-wrapper/HarmonyX.csproj" \
 echo "# Build BepInEx"
 BEPINEX_WRAPPER_PATH="$DEPS_PATH/bepinex-wrapper"
 BEPINEX_FRAMEWORK_ROOT="$HOME/.nuget/packages/microsoft.netframework.referenceassemblies.net462/1.0.3/build"
-BEPINEX_VERSION=5.4.23.3
+BEPINEX_VERSION=5.4.23.5
 
 clean_build_files "$BEPINEX_WRAPPER_PATH"
 clean_build_files "$DEPS_PATH/BepInEx"
@@ -383,7 +383,7 @@ cat << 'EOF' > dist/tmp/BepInEx/plugins/manifest.json
     "website_url": "",
     "description": "Jotunn is a modding library for Valheim.",
     "dependencies": [
-        "denikson-BepInExPack_Valheim-5.4.2333"
+        "denikson-BepInExPack_Valheim-5.4.2350"
     ]
 }
 EOF
@@ -400,7 +400,7 @@ cat << 'EOF' > dist/tmp/BepInEx/plugins/ConfigurationManager/manifest.json
     "website_url": "",
     "description": "Configuration Manager is a modding library for Valheim.",
     "dependencies": [
-        "denikson-BepInExPack_Valheim-5.4.2333"
+        "denikson-BepInExPack_Valheim-5.4.2350"
     ]
 }
 EOF
