@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -24,6 +23,7 @@ public class HardHeim : BaseUnityPlugin
 
     private ConfigEntry<float> copperOreWeight;
     private ConfigEntry<float> surtlingCoreWeight;
+    internal static ConfigEntry<float> cryptSurtlingCoreChance;
     private static Harmony harmony;
 
     #region Plugin lifecycle and configuration
@@ -42,10 +42,19 @@ public class HardHeim : BaseUnityPlugin
         surtlingCoreWeight = Config.Bind(
             "Ore Weights",
             "SurtlingCore",
-            200f,
+            150f,
             new ConfigDescription(
                 "Weight of one surtling core.",
                 new AcceptableValueRange<float>(0.1f, 1000f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        cryptSurtlingCoreChance = Config.Bind(
+            "Crypt Loot",
+            "SurtlingCoreChance",
+            30f,
+            new ConfigDescription(
+                "Percent chance (0-100) to find a Surtling Core in a Burial Chamber (0 or 1 total per crypt).",
+                new AcceptableValueRange<float>(0f, 100f),
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
         harmony = new Harmony(PluginGUID);
@@ -98,6 +107,7 @@ public class HardHeim : BaseUnityPlugin
         harmony?.UnpatchSelf();
     }
 
+    // Ensures dungeon lighting overrides stay active across interior transitions.
     [HarmonyPatch(typeof(Player), "FixedUpdate")]
     public static class CryptEntryPatch
     {
@@ -114,17 +124,36 @@ public class HardHeim : BaseUnityPlugin
 
     #region Crypt loot
 
+    // Reduces Surtling Core stands in Burial Chambers to 0 or 1 total per crypt based on configurable chance.
     [HarmonyPatch]
     public static class CryptLootPatch
     {
-        private static IEnumerable<MethodBase> TargetMethods()
+        private static bool wasInsideCrypt;
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Player), "FixedUpdate")]
+        private static void OnPlayerFixedUpdate()
         {
-            return typeof(DungeonGenerator)
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(method => method.Name == nameof(DungeonGenerator.Generate));
+            if (Player.m_localPlayer == null)
+            {
+                return;
+            }
+
+            bool insideCrypt = Player.m_localPlayer.InInterior();
+            if (!insideCrypt)
+            {
+                wasInsideCrypt = false;
+                return;
+            }
+
+            if (!wasInsideCrypt)
+            {
+                wasInsideCrypt = true;
+                ProcessCurrentCrypt();
+            }
         }
 
-        private static void Postfix(DungeonGenerator __instance)
+        private static void ProcessCurrentCrypt()
         {
             var surtlingCore = PrefabManager.Cache.GetPrefab<ItemDrop>("SurtlingCore");
             if (surtlingCore == null)
@@ -132,26 +161,38 @@ public class HardHeim : BaseUnityPlugin
                 return;
             }
 
-            var inventories = __instance.GetComponentsInChildren<Container>(true)
-                .Select(container => container.GetInventory())
-                .Where(inventory => inventory != null)
-                .ToList();
-            var coreItems = inventories
-                .SelectMany(inventory => inventory.GetAllItems())
-                .Where(item => item.m_dropPrefab == surtlingCore.gameObject)
+            var playerPos = Player.m_localPlayer.transform.position;
+
+            // Target placed Surtling Core stands within the local dungeon area (80m radius)
+            var stands = UnityEngine.Object.FindObjectsByType<Pickable>(FindObjectsSortMode.None)
+                .Where(p => p.gameObject.scene.IsValid()
+                         && p.m_itemPrefab == surtlingCore.gameObject
+                         && Vector3.Distance(p.transform.position, playerPos) <= 80f)
                 .ToList();
 
-            foreach (var coreItem in coreItems)
-            {
-                coreItem.m_stack = 0;
-            }
-
-            if (UnityEngine.Random.Range(0, 2) == 0 || inventories.Count == 0)
+            if (stands.Count == 0)
             {
                 return;
             }
 
-            inventories[UnityEngine.Random.Range(0, inventories.Count)].AddItem(surtlingCore.gameObject, 1);
+            float roll = UnityEngine.Random.Range(0f, 100f);
+            float chance = cryptSurtlingCoreChance != null ? cryptSurtlingCoreChance.Value : 30f;
+            bool keepOne = roll < chance;
+
+            // Keep only the first stand if roll succeeded; otherwise destroy all
+            var toRemove = keepOne ? stands.Skip(1) : stands;
+            foreach (var stand in toRemove)
+            {
+                var target = stand.gameObject;
+                if (ZNetScene.instance != null)
+                {
+                    ZNetScene.instance.Destroy(target);
+                }
+                else
+                {
+                    UnityEngine.Object.Destroy(target);
+                }
+            }
         }
     }
 
