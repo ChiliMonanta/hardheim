@@ -374,9 +374,9 @@ sed -i 's|^target_assembly=.*|target_assembly="BepInEx/core/BepInEx.Preloader.dl
 rm -rf dist/tmp
 
 echo "# Create Jotunn package"
-mkdir -p dist/tmp/BepInEx/plugins
-cp $DEPS_PATH/Jotunn/JotunnLib/bin/Release/net462/Jotunn.dll dist/tmp/BepInEx/plugins
-cat << 'EOF' > dist/tmp/BepInEx/plugins/manifest.json
+mkdir -p dist/tmp/BepInEx/plugins/Jotunn
+cp $DEPS_PATH/Jotunn/JotunnLib/bin/Release/net462/Jotunn.dll dist/tmp/BepInEx/plugins/Jotunn
+cat << 'EOF' > dist/tmp/BepInEx/plugins/Jotunn/manifest.json
 {
     "name": "Jotunn",
   "version_number": "$JOTUNN_VERSION",
