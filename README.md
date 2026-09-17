@@ -9,6 +9,7 @@ The current implementation focuses on progression pacing and atmosphere:
 - Configurable weights for Copper Ore and Surtling Cores.
 - Custom death penalty scaling based on skill level.
 - Pitch-black dungeons and crypts requiring handheld light sources.
+- Ships take configurable damage from severe storms, but are protected in shallow water so they do not take damage while close to shore.
 
 Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim/p/Dudes/HardHeim/).
 
@@ -19,6 +20,7 @@ Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim
 - **Crypt Surtling Core Scarcity:** Burial Chambers contain 0 or 1 Surtling Core total based on a configurable chance (default `30%`).
 - **Custom Death Penalty:** Skill loss scaled by level.
 - **Dark Crypts & Caves:** Forced darkness indoors with tuned handheld lighting.
+- **Storm Ship Damage:** Ships take blunt damage while wind force reaches the configured storm threshold, but are protected in shallow water so they do not take damage while close to shore.
 - **Server Synchronization:** Jötunn-managed server-to-client config synchronization and version enforcement.
 
 The generated BepInEx configuration can be adjusted in:
@@ -26,6 +28,8 @@ The generated BepInEx configuration can be adjusted in:
 ```text
 BepInEx/config/com.valheim.hardheim.cfg
 ```
+
+- `Storm Ship Damage -> ShallowWaterDepth`: storms do not damage ships when the seabed is close below them; this protects boats in shallow water and near shore.
 
 ## Architecture
 

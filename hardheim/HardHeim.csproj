@@ -7,7 +7,7 @@
     <VersionPrefix>0.0.4</VersionPrefix>
     <RootNamespace>HardHeim</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <!-- 
+    <!--
       Suppress internal MSBuild reference warnings:
       - MSB3245: Missing Unity modules (e.g., XR/VR) referenced by Jötunn but not required by this mod.
       - MSB3243: Version conflicts between Jötunn's NuGet packages and the game's native Unity DLLs.
@@ -26,6 +26,7 @@
     <Reference  Include="UnityEngine.CoreModule">
       <HintPath>$(ValheimDir)/UnityEngine.CoreModule.dll</HintPath>
     </Reference >
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(ValheimDir)/UnityEngine.PhysicsModule.dll</HintPath></Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath>$(ValheimDir)/UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>

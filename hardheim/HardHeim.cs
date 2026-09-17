@@ -23,7 +23,19 @@ public class HardHeim : BaseUnityPlugin
 
     private ConfigEntry<float> copperOreWeight;
     private ConfigEntry<float> surtlingCoreWeight;
+    private ConfigEntry<float> stormWindThreshold;
+    private ConfigEntry<float> stormShipDamagePerSecond;
+    private ConfigEntry<float> stormMaxDamageMultiplier;
+    private ConfigEntry<float> stormShakeStrength;
+    private ConfigEntry<float> stormShakeRange;
+    private ConfigEntry<float> stormShallowWaterDepth;
     internal static ConfigEntry<float> cryptSurtlingCoreChance;
+    internal static ConfigEntry<float> StormWindThreshold;
+    internal static ConfigEntry<float> StormShipDamagePerSecond;
+    internal static ConfigEntry<float> StormMaxDamageMultiplier;
+    internal static ConfigEntry<float> StormShakeStrength;
+    internal static ConfigEntry<float> StormShakeRange;
+    internal static ConfigEntry<float> StormShallowWaterDepth;
     private static Harmony harmony;
 
     #region Plugin lifecycle and configuration
@@ -56,6 +68,67 @@ public class HardHeim : BaseUnityPlugin
                 "Percent chance (0-100) to find a Surtling Core in a Burial Chamber (0 or 1 total per crypt).",
                 new AcceptableValueRange<float>(0f, 100f),
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        stormWindThreshold = Config.Bind(
+            "Storm Ship Damage",
+            "WindThreshold",
+            0.8f,
+            new ConfigDescription(
+                "Minimum wind force required for storms to damage ships.",
+                new AcceptableValueRange<float>(0f, 1f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        stormShipDamagePerSecond = Config.Bind(
+            "Storm Ship Damage",
+            "DamagePerSecond",
+            7f,
+            new ConfigDescription(
+                "Blunt damage dealt to ships per second during storms.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        stormMaxDamageMultiplier = Config.Bind(
+            "Storm Ship Damage",
+            "MaxDamageMultiplier",
+            2f,
+            new ConfigDescription(
+                "Maximum damage multiplier at the strongest wind.",
+                new AcceptableValueRange<float>(1f, 10f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+            stormShakeStrength = Config.Bind(
+                "Storm Ship Damage",
+                "ShakeStrength",
+                0.2f,
+                new ConfigDescription(
+                "Camera shake strength when a wave damages the ship.",
+                new AcceptableValueRange<float>(0f, 2f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+            stormShakeRange = Config.Bind(
+                "Storm Ship Damage",
+                "ShakeRange",
+                20f,
+                new ConfigDescription(
+                "Maximum distance at which storm ship impacts shake the camera.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        stormShallowWaterDepth = Config.Bind(
+            "Storm Ship Damage",
+            "ShallowWaterDepth",
+            15f,
+            new ConfigDescription(
+                "Ships do not take storm damage when the seabed is this close below them.",
+                new AcceptableValueRange<float>(0f, 40f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        StormWindThreshold = stormWindThreshold;
+        StormShipDamagePerSecond = stormShipDamagePerSecond;
+        StormMaxDamageMultiplier = stormMaxDamageMultiplier;
+            StormShakeStrength = stormShakeStrength;
+            StormShakeRange = stormShakeRange;
+        StormShallowWaterDepth = stormShallowWaterDepth;
 
         harmony = new Harmony(PluginGUID);
         try
@@ -117,6 +190,105 @@ public class HardHeim : BaseUnityPlugin
             {
                 CryptEnvironmentPatch.Refresh(EnvMan.instance);
             }
+        }
+    }
+
+    #endregion
+
+    #region Storm ship damage
+
+    [HarmonyPatch(typeof(Ship), "CustomFixedUpdate")]
+    public static class StormShipDamagePatch
+    {
+        private static readonly Dictionary<int, float> nextDamageTime = new();
+
+        private static void Postfix(Ship __instance)
+        {
+            if (__instance == null
+                || StormShipDamagePerSecond == null
+                || StormShipDamagePerSecond.Value <= 0f
+                || EnvMan.instance == null)
+            {
+                return;
+            }
+
+            var windStrength = EnvMan.instance.GetWindForce().magnitude;
+
+            var networkView = __instance.GetComponent<ZNetView>();
+            var wearNTear = __instance.GetComponent<WearNTear>();
+            if (networkView == null
+                || wearNTear == null
+                || !networkView.IsValid()
+                || !networkView.IsOwner()
+                || windStrength < StormWindThreshold.Value)
+            {
+                return;
+            }
+
+            int shipId = __instance.GetInstanceID();
+            if (nextDamageTime.TryGetValue(shipId, out float nextTime)
+                && Time.time < nextTime)
+            {
+                return;
+            }
+
+            if (StormShallowWaterDepth.Value > 0f && IsInShallowWater(__instance))
+            {
+                return;
+            }
+
+            nextDamageTime[shipId] = Time.time + 1f;
+
+            float stormProgress = StormWindThreshold.Value >= 1f
+                ? 1f
+                : Mathf.Clamp01((windStrength - StormWindThreshold.Value)
+                    / (1f - StormWindThreshold.Value));
+            float damageMultiplier = Mathf.Lerp(
+                1f,
+                StormMaxDamageMultiplier.Value,
+                stormProgress);
+
+            var hit = new HitData
+            {
+                m_damage = new HitData.DamageTypes
+                {
+                    m_blunt = StormShipDamagePerSecond.Value * damageMultiplier
+                },
+                m_point = __instance.transform.position + __instance.transform.right * 1.5f,
+                m_dir = Vector3.up,
+                m_dodgeable = false
+            };
+
+            wearNTear.Damage(hit);
+
+            if (GameCamera.instance != null
+                && StormShakeStrength.Value > 0f
+                && StormShakeRange.Value > 0f)
+            {
+                GameCamera.instance.AddShake(
+                    __instance.transform.position,
+                    StormShakeRange.Value,
+                    StormShakeStrength.Value,
+                    false);
+            }
+        }
+
+        private static bool IsInShallowWater(Ship ship)
+        {
+            if (ship == null || StormShallowWaterDepth.Value <= 0f)
+            {
+                return false;
+            }
+
+            var heightmap = Heightmap.FindHeightmap(ship.transform.position);
+            if (heightmap == null)
+            {
+                return false;
+            }
+
+            float oceanDepth = heightmap.GetOceanDepth(ship.transform.position);
+            float shallowThreshold = StormShallowWaterDepth.Value + 1.5f;
+            return oceanDepth >= 0f && oceanDepth <= shallowThreshold;
         }
     }
 
