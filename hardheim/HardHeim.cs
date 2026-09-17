@@ -31,6 +31,7 @@ public class HardHeim : BaseUnityPlugin
     private ConfigEntry<float> stormShakeRange;
     private ConfigEntry<float> stormShallowWaterDepth;
     internal static ConfigEntry<float> cryptSurtlingCoreChance;
+    internal static ConfigEntry<bool> StormShipDamageEnabled;
     internal static ConfigEntry<float> StormWindThreshold;
     internal static ConfigEntry<float> StormShipDamagePerSecond;
     internal static ConfigEntry<float> StormMaxDamageMultiplier;
@@ -83,6 +84,15 @@ public class HardHeim : BaseUnityPlugin
             new ConfigDescription(
                 "Minimum wind force required for storms to damage ships.",
                 new AcceptableValueRange<float>(0f, 1f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        StormShipDamageEnabled = Config.Bind(
+            "Storm Ship Damage",
+            "Enabled",
+            true,
+            new ConfigDescription(
+                "Enable storm damage to ships.",
+                null,
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
         stormShipDamagePerSecond = Config.Bind(
@@ -270,6 +280,8 @@ public class HardHeim : BaseUnityPlugin
         private static void Postfix(Ship __instance)
         {
             if (__instance == null
+                || StormShipDamageEnabled == null
+                || !StormShipDamageEnabled.Value
                 || StormShipDamagePerSecond == null
                 || StormShipDamagePerSecond.Value <= 0f
                 || EnvMan.instance == null)
