@@ -1,3 +1,7 @@
+## v0.0.5
+- **Storm Ship Damage:** Ships now take damage from waves during severe storms with strong wind, so anchoring in a sheltered bay or shallow water near shore is safer than riding out a storm at sea.
+- **Lightning Strikes:** During thunderstorms, standing out in the open (without a roof overhead) risks being struck by lightning, dropping your health to 10. It's riskier on a ship than on land, so seek shelter when thunder rolls in.
+
 ## v0.0.4
 - **Surtling Core Scarcity:** Burial Chambers contain at most 1 Surtling Core, with a configurable spawn chance (defaults to 30%, resulting in 0 or 1 core per crypt).
 - **Surtling Core Weight:** Configurable Surtling Core weight on the server (defaults to 150 kg).

@@ -32,7 +32,7 @@ BepInEx/config/com.valheim.hardheim.cfg
 ```
 
 - `Storm Ship Damage -> ShallowWaterDepth`: storms do not damage ships when the seabed is close below them; this protects boats in shallow water and near shore.
-- `Lightning Strikes -> Enabled`, `LandChancePercent`, `ShipChancePercent`, `CheckIntervalSeconds`, `CooldownSeconds`, `ThunderstormEnvironments`: control whether, how often, and how likely lightning strikes are, and the cooldown before a player can be struck again.
+- `Lightning Strikes -> Enabled`, `LandChancePercent` (default `0.5`), `ShipChancePercent` (default `1`), `CheckIntervalSeconds` (default `130`), `CooldownSeconds` (default `120`), `ThunderstormEnvironments`: control whether, how often, and how likely lightning strikes are, and the cooldown before a player can be struck again.
 
 ## Architecture
 
