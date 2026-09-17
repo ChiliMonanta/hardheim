@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
@@ -36,6 +37,12 @@ public class HardHeim : BaseUnityPlugin
     internal static ConfigEntry<float> StormShakeStrength;
     internal static ConfigEntry<float> StormShakeRange;
     internal static ConfigEntry<float> StormShallowWaterDepth;
+    internal static ConfigEntry<bool> LightningEnabled;
+    internal static ConfigEntry<float> LightningLandChance;
+    internal static ConfigEntry<float> LightningShipChance;
+    internal static ConfigEntry<float> LightningCheckInterval;
+    internal static ConfigEntry<float> LightningCooldownSeconds;
+    internal static ConfigEntry<string> LightningWeatherNames;
     private static Harmony harmony;
 
     #region Plugin lifecycle and configuration
@@ -96,23 +103,23 @@ public class HardHeim : BaseUnityPlugin
                 new AcceptableValueRange<float>(1f, 10f),
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-            stormShakeStrength = Config.Bind(
-                "Storm Ship Damage",
-                "ShakeStrength",
-                0.2f,
-                new ConfigDescription(
-                "Camera shake strength when a wave damages the ship.",
-                new AcceptableValueRange<float>(0f, 2f),
-                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+        stormShakeStrength = Config.Bind(
+            "Storm Ship Damage",
+            "ShakeStrength",
+            0.2f,
+            new ConfigDescription(
+            "Camera shake strength when a wave damages the ship.",
+            new AcceptableValueRange<float>(0f, 2f),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-            stormShakeRange = Config.Bind(
-                "Storm Ship Damage",
-                "ShakeRange",
-                20f,
-                new ConfigDescription(
-                "Maximum distance at which storm ship impacts shake the camera.",
-                new AcceptableValueRange<float>(0f, 100f),
-                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+        stormShakeRange = Config.Bind(
+            "Storm Ship Damage",
+            "ShakeRange",
+            20f,
+            new ConfigDescription(
+            "Maximum distance at which storm ship impacts shake the camera.",
+            new AcceptableValueRange<float>(0f, 100f),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
         stormShallowWaterDepth = Config.Bind(
             "Storm Ship Damage",
@@ -126,9 +133,67 @@ public class HardHeim : BaseUnityPlugin
         StormWindThreshold = stormWindThreshold;
         StormShipDamagePerSecond = stormShipDamagePerSecond;
         StormMaxDamageMultiplier = stormMaxDamageMultiplier;
-            StormShakeStrength = stormShakeStrength;
-            StormShakeRange = stormShakeRange;
+        StormShakeStrength = stormShakeStrength;
+        StormShakeRange = stormShakeRange;
         StormShallowWaterDepth = stormShallowWaterDepth;
+
+        LightningEnabled = Config.Bind(
+            "Lightning Strikes",
+            "Enabled",
+            true,
+            new ConfigDescription(
+                "Enable lightning strikes on players during thunderstorms.",
+                null,
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        // A thunderstorm is 666s
+        // A check every 130s with percentage:
+        // Land 0.5% will give a total 5% over the duration of a thunderstorm
+        // Ship 1% will give a total 10% over the duration of a thunderstorm
+        LightningLandChance = Config.Bind(
+            "Lightning Strikes",
+            "LandChancePercent",
+            0.5f,
+            new ConfigDescription(
+                "Percent chance (0-100) per check to be struck while on land during a thunderstorm.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        LightningShipChance = Config.Bind(
+            "Lightning Strikes",
+            "ShipChancePercent",
+            1f,
+            new ConfigDescription(
+                "Percent chance (0-100) per check to be struck while on a ship during a thunderstorm.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        LightningCheckInterval = Config.Bind(
+            "Lightning Strikes",
+            "CheckIntervalSeconds",
+            130f,
+            new ConfigDescription(
+                "How often (in seconds) the strike chance is rolled per player.",
+                new AcceptableValueRange<float>(0.1f, 240f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        LightningWeatherNames = Config.Bind(
+            "Lightning Strikes",
+            "ThunderstormEnvironments",
+            "ThunderStorm",
+            new ConfigDescription(
+                "Comma-separated environment names that count as a thunderstorm.",
+                null,
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        LightningCooldownSeconds = Config.Bind(
+            "Lightning Strikes",
+            "CooldownSeconds",
+            120f,
+            new ConfigDescription(
+                "Minimum time after being struck before a player can be struck again.",
+                new AcceptableValueRange<float>(0f, 3600f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
         harmony = new Harmony(PluginGUID);
         try
@@ -289,6 +354,249 @@ public class HardHeim : BaseUnityPlugin
             float oceanDepth = heightmap.GetOceanDepth(ship.transform.position);
             float shallowThreshold = StormShallowWaterDepth.Value + 1.5f;
             return oceanDepth >= 0f && oceanDepth <= shallowThreshold;
+        }
+    }
+
+    #endregion
+
+    #region Lightning strikes
+
+    // Rolls a chance to strike the local player with lightning during thunderstorms, unless sheltered.
+    [HarmonyPatch]
+    public static class LightningStrikePatch
+    {
+        private const string RpcName = "HardHeim_LightningStrike";
+
+        // Anything solid overhead counts as a roof; character-related layers are excluded so players don't shield each other.
+        private static readonly int RoofRaycastMask = ~LayerMask.GetMask("Character", "character_trigger", "character_noenv", "Default_small");
+
+        private static float nextCheckTime;
+        private static float nextStrikeAllowedTime;
+        private static bool rpcRegistered;
+
+        // ZRoutedRpc.instance does not exist during plugin Awake, so register lazily once it appears.
+        private static void EnsureRpcRegistered()
+        {
+            if (rpcRegistered || ZRoutedRpc.instance == null)
+            {
+                return;
+            }
+
+            ZRoutedRpc.instance.Register<Vector3, string>(RpcName, OnLightningStrikeRpc);
+            rpcRegistered = true;
+            Jotunn.Logger.LogInfo("HardHeim: lightning RPC registered.");
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Player), "FixedUpdate")]
+        private static void OnPlayerFixedUpdate()
+        {
+            EnsureRpcRegistered();
+
+            var player = Player.m_localPlayer;
+            if (player == null || LightningEnabled == null || !LightningEnabled.Value)
+            {
+                return;
+            }
+
+            if (Time.time < nextCheckTime)
+            {
+                return;
+            }
+
+            nextCheckTime = Time.time + Mathf.Max(0.1f, LightningCheckInterval.Value);
+
+            if (Time.time < nextStrikeAllowedTime)
+            {
+                return;
+            }
+
+            if (!IsThunderstorm() || HasRoofOverhead(player))
+            {
+                return;
+            }
+
+            bool onShip = player.GetComponentInParent<Ship>() != null;
+            float chance = onShip ? LightningShipChance.Value : LightningLandChance.Value;
+            if (UnityEngine.Random.Range(0f, 100f) >= chance)
+            {
+                return;
+            }
+
+            StrikePlayer(player);
+        }
+
+        private static bool IsThunderstorm()
+        {
+            var environment = EnvMan.instance?.GetCurrentEnvironment();
+            if (environment == null || string.IsNullOrEmpty(LightningWeatherNames.Value))
+            {
+                return false;
+            }
+
+            return LightningWeatherNames.Value
+                .Split(',')
+                .Select(name => name.Trim())
+                .Any(name => string.Equals(name, environment.m_name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool HasRoofOverhead(Player player)
+        {
+            var origin = player.transform.position + Vector3.up * 0.5f;
+            return Physics.Raycast(origin, Vector3.up, 300f, RoofRaycastMask);
+        }
+
+        private static void StrikePlayer(Player player)
+        {
+            nextStrikeAllowedTime = Time.time + Mathf.Max(0f, LightningCooldownSeconds.Value);
+
+            player.SetHealth(10f);
+            player.Message(MessageHud.MessageType.Center, "Thor's wrath has struck you down!");
+            player.StartCoroutine(ClearCenterMessageAfter(3f));
+
+            Jotunn.Logger.LogInfo($"HardHeim: lightning struck {player.GetPlayerName()} at {player.transform.position}, sending RPC.");
+            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, RpcName, player.transform.position, player.GetPlayerName());
+        }
+
+        // Center messages otherwise stay up for the game's default duration; cut it short instead.
+        private static IEnumerator ClearCenterMessageAfter(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, string.Empty);
+        }
+
+        private static void OnLightningStrikeRpc(long sender, Vector3 position, string playerName)
+        {
+            Jotunn.Logger.LogInfo($"HardHeim: lightning RPC received for {playerName} at {position}.");
+            SpawnLightningVisual(position);
+
+            // The struck player already gets a center message locally; only notify everyone else.
+            if (Player.m_localPlayer != null && !string.Equals(Player.m_localPlayer.GetPlayerName(), playerName, StringComparison.Ordinal))
+            {
+                MessageHud.instance?.ShowMessage(MessageHud.MessageType.TopLeft, $"Thor struck {playerName} down!");
+            }
+        }
+
+        // Built purely from engine primitives so the effect never depends on guessing a game asset name.
+        private static void SpawnLightningVisual(Vector3 position)
+        {
+            var boltObject = new GameObject("HardHeim_LightningBolt");
+            boltObject.transform.position = position;
+
+            var flash = boltObject.AddComponent<Light>();
+            flash.type = LightType.Point;
+            flash.color = new Color(0.75f, 0.85f, 1f);
+            flash.intensity = 6f;
+            flash.range = 20f;
+            flash.shadows = LightShadows.None;
+
+            var shader = ResolveBoltShader();
+            var points = GenerateBoltPoints(position + Vector3.up * 40f, position);
+
+            // A wide, faint glow plus a thin bright core reads as a lightning bolt rather than a straight laser line.
+            CreateBoltLine(boltObject, "Glow", points, shader, 0.6f, new Color(0.6f, 0.8f, 1f, 0.35f));
+            CreateBoltLine(boltObject, "Core", points, shader, 0.12f, Color.white);
+
+            boltObject.AddComponent<LightningFlashEffect>();
+
+            if (GameCamera.instance != null)
+            {
+                GameCamera.instance.AddShake(position, 15f, 0.3f, false);
+            }
+        }
+
+        // Zigzags the bolt between the sky and the impact point, tapering the jitter near both ends.
+        private static Vector3[] GenerateBoltPoints(Vector3 start, Vector3 end)
+        {
+            const int segments = 10;
+            var points = new Vector3[segments + 1];
+            points[0] = start;
+            points[segments] = end;
+
+            for (int i = 1; i < segments; i++)
+            {
+                float t = (float)i / segments;
+                var basePoint = Vector3.Lerp(start, end, t);
+                float jitterScale = Mathf.Sin(t * Mathf.PI);
+                var jitter = new Vector3(
+                    UnityEngine.Random.Range(-1f, 1f),
+                    0f,
+                    UnityEngine.Random.Range(-1f, 1f)) * jitterScale * 1.5f;
+                points[i] = basePoint + jitter;
+            }
+
+            return points;
+        }
+
+        private static void CreateBoltLine(GameObject parent, string childName, Vector3[] points, Shader shader, float width, Color color)
+        {
+            var child = new GameObject(childName);
+            child.transform.SetParent(parent.transform, worldPositionStays: true);
+
+            var line = child.AddComponent<LineRenderer>();
+            line.positionCount = points.Length;
+            line.SetPositions(points);
+            line.startWidth = width;
+            line.endWidth = width * 0.3f;
+            line.useWorldSpace = true;
+            line.startColor = color;
+            line.endColor = new Color(color.r, color.g, color.b, color.a * 0.5f);
+
+            if (shader != null)
+            {
+                line.material = new Material(shader) { color = color };
+            }
+        }
+
+        private static readonly string[] BoltShaderNames =
+        {
+            "Unlit/Color",
+            "Sprites/Default",
+            "Standard"
+        };
+
+        private static Shader ResolveBoltShader()
+        {
+            foreach (var shaderName in BoltShaderNames)
+            {
+                var shader = Shader.Find(shaderName);
+                if (shader != null)
+                {
+                    return shader;
+                }
+            }
+
+            return null;
+        }
+
+        // Holds the flash at full brightness before fading, so it lingers long enough to notice.
+        private sealed class LightningFlashEffect : MonoBehaviour
+        {
+            private const float HoldDuration = 2f;
+            private const float FadeDuration = 1f;
+            private const float StartIntensity = 6f;
+            private float elapsed;
+            private Light flashLight;
+
+            private void Awake()
+            {
+                flashLight = GetComponent<Light>();
+            }
+
+            private void Update()
+            {
+                elapsed += Time.deltaTime;
+                if (flashLight != null)
+                {
+                    float fadeProgress = Mathf.Clamp01((elapsed - HoldDuration) / FadeDuration);
+                    flashLight.intensity = Mathf.Lerp(StartIntensity, 0f, fadeProgress);
+                }
+
+                if (elapsed >= HoldDuration + FadeDuration)
+                {
+                    Destroy(gameObject);
+                }
+            }
         }
     }
 
