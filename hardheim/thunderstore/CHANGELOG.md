@@ -1,3 +1,9 @@
+## v0.0.6
+
+- Prevent raid-spawned creatures from dropping loot.
+- Add the configurable `Raid Loot -> BlockRaidDrops` setting.
+- Preserve normal loot drops for ordinary creatures.
+
 ## v0.0.5
 - **Storm Ship Damage:** Ships now take damage from waves during severe storms with strong wind, so anchoring in a sheltered bay or shallow water near shore is safer than riding out a storm at sea.
 - **Lightning Strikes:** During thunderstorms, standing out in the open (without a roof overhead) risks being struck by lightning, dropping your health to 10. It's riskier on a ship than on land, so seek shelter when thunder rolls in.
