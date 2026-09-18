@@ -29,6 +29,7 @@ public class HardHeim : BaseUnityPlugin
     private ConfigEntry<float> stormShakeStrength;
     private ConfigEntry<float> stormShakeRange;
     private ConfigEntry<float> stormShallowWaterDepth;
+    private ConfigEntry<bool> blockRaidDrops;
     internal static ConfigEntry<float> cryptSurtlingCoreChance;
     internal static ConfigEntry<bool> StormShipDamageEnabled;
     internal static ConfigEntry<float> StormWindThreshold;
@@ -37,6 +38,7 @@ public class HardHeim : BaseUnityPlugin
     internal static ConfigEntry<float> StormShakeStrength;
     internal static ConfigEntry<float> StormShakeRange;
     internal static ConfigEntry<float> StormShallowWaterDepth;
+    internal static ConfigEntry<bool> BlockRaidDrops;
     internal static ConfigEntry<bool> LightningEnabled;
     internal static ConfigEntry<float> LightningLandChance;
     internal static ConfigEntry<float> LightningShipChance;
@@ -146,6 +148,16 @@ public class HardHeim : BaseUnityPlugin
         StormShakeRange = stormShakeRange;
         StormShallowWaterDepth = stormShallowWaterDepth;
 
+        blockRaidDrops = Config.Bind(
+            "Raid Loot",
+            "BlockRaidDrops",
+            true,
+            new ConfigDescription(
+                "Prevent creatures spawned by raids from dropping loot.",
+                null,
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+        BlockRaidDrops = blockRaidDrops;
+
         LightningEnabled = Config.Bind(
             "Lightning Strikes",
             "Enabled",
@@ -235,6 +247,7 @@ public class HardHeim : BaseUnityPlugin
         Logger.LogInfo($"Storm shake strength set to {StormShakeStrength.Value}.");
         Logger.LogInfo($"Storm shake range set to {StormShakeRange.Value}.");
         Logger.LogInfo($"Storm shallow water depth set to {StormShallowWaterDepth.Value}.");
+        Logger.LogInfo($"Raid drops blocked set to {BlockRaidDrops.Value}.");
         Logger.LogInfo($"Lightning strikes enabled set to {LightningEnabled.Value}.");
         Logger.LogInfo($"Lightning land chance set to {LightningLandChance.Value}%.");
         Logger.LogInfo($"Lightning ship chance set to {LightningShipChance.Value}%.");
@@ -284,6 +297,61 @@ public class HardHeim : BaseUnityPlugin
             {
                 CryptEnvironmentPatch.Refresh(EnvMan.instance);
             }
+        }
+    }
+
+    #endregion
+
+    #region Raid loot
+
+    private const string RaidSpawnZdoKey = "HardHeim_RaidSpawn";
+
+    [HarmonyPatch(typeof(MonsterAI), nameof(MonsterAI.SetEventCreature))]
+    public static class RaidCreaturePatch
+    {
+        private static void Postfix(MonsterAI __instance, bool despawn)
+        {
+            if (!despawn)
+            {
+                return;
+            }
+
+            var networkView = __instance?.GetComponent<ZNetView>();
+            if (networkView == null || !networkView.IsValid())
+            {
+                return;
+            }
+
+            networkView.GetZDO().Set(RaidSpawnZdoKey, true);
+        }
+    }
+
+    [HarmonyPatch(typeof(CharacterDrop), nameof(CharacterDrop.GenerateDropList))]
+    public static class RaidLootPatch
+    {
+        private static bool Prefix(
+            CharacterDrop __instance,
+            ref List<KeyValuePair<GameObject, int>> __result)
+        {
+            if (BlockRaidDrops == null || !BlockRaidDrops.Value || __instance == null)
+            {
+                return true;
+            }
+
+            var networkView = __instance.GetComponent<ZNetView>();
+            bool taggedAsRaidSpawn = networkView != null
+                && networkView.IsValid()
+                && networkView.GetZDO().GetBool(RaidSpawnZdoKey, false);
+
+            var monsterAI = __instance.GetComponent<MonsterAI>();
+            bool markedAsEventCreature = monsterAI != null && monsterAI.IsEventCreature();
+            if (!taggedAsRaidSpawn && !markedAsEventCreature)
+            {
+                return true;
+            }
+
+            __result = new List<KeyValuePair<GameObject, int>>();
+            return false;
         }
     }
 
