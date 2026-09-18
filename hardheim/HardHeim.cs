@@ -218,8 +218,30 @@ public class HardHeim : BaseUnityPlugin
 
         Logger.LogInfo($"{PluginName} started.");
         Jotunn.Logger.LogInfo($"{PluginName} started through Jotunn.");
+        LogConfiguration();
         ItemManager.OnItemsRegistered += SetItemWeights;
         SynchronizationManager.OnConfigurationSynchronized += OnConfigurationSynchronized;
+    }
+
+    // Logs every config value once at startup so the current setup is visible without repeating on every sync.
+    private void LogConfiguration()
+    {
+        Logger.LogInfo($"Copper ore weight set to {copperOreWeight.Value}.");
+        Logger.LogInfo($"Surtling core weight set to {surtlingCoreWeight.Value}.");
+        Logger.LogInfo($"Crypt Surtling Core chance set to {cryptSurtlingCoreChance.Value}%.");
+        Logger.LogInfo($"Storm ship damage enabled set to {StormShipDamageEnabled.Value}.");
+        Logger.LogInfo($"Storm wind threshold set to {StormWindThreshold.Value}.");
+        Logger.LogInfo($"Storm ship damage per second set to {StormShipDamagePerSecond.Value}.");
+        Logger.LogInfo($"Storm max damage multiplier set to {StormMaxDamageMultiplier.Value}.");
+        Logger.LogInfo($"Storm shake strength set to {StormShakeStrength.Value}.");
+        Logger.LogInfo($"Storm shake range set to {StormShakeRange.Value}.");
+        Logger.LogInfo($"Storm shallow water depth set to {StormShallowWaterDepth.Value}.");
+        Logger.LogInfo($"Lightning strikes enabled set to {LightningEnabled.Value}.");
+        Logger.LogInfo($"Lightning land chance set to {LightningLandChance.Value}%.");
+        Logger.LogInfo($"Lightning ship chance set to {LightningShipChance.Value}%.");
+        Logger.LogInfo($"Lightning check interval set to {LightningCheckInterval.Value} seconds.");
+        Logger.LogInfo($"Lightning cooldown set to {LightningCooldownSeconds.Value} seconds.");
+        Logger.LogInfo($"Lightning thunderstorm environments set to {LightningWeatherNames.Value}.");
     }
 
     private void SetItemWeights()
@@ -232,7 +254,6 @@ public class HardHeim : BaseUnityPlugin
         }
 
         copperOre.m_itemData.m_shared.m_weight = copperOreWeight.Value;
-        Logger.LogInfo($"Copper ore weight set to {copperOreWeight.Value}.");
 
         var surtlingCore = PrefabManager.Cache.GetPrefab<ItemDrop>("SurtlingCore");
         if (surtlingCore == null)
@@ -242,7 +263,6 @@ public class HardHeim : BaseUnityPlugin
         }
 
         surtlingCore.m_itemData.m_shared.m_weight = surtlingCoreWeight.Value;
-        Logger.LogInfo($"Surtling core weight set to {surtlingCoreWeight.Value}.");
     }
 
     private void OnConfigurationSynchronized(object sender, ConfigurationSynchronizationEventArgs args)
