@@ -34,3 +34,5 @@ ENV PATH="/home/${USERNAME}/.dotnet/tools:${PATH}"
 WORKDIR /workspace
 
 USER ${USERNAME}
+
+RUN dotnet tool install --global ilspycmd --version 9.*
