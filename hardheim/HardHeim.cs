@@ -13,14 +13,13 @@ using UnityEngine.Rendering;
 
 namespace HardHeim;
 
-[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+[BepInPlugin(PluginGUID, PluginName, PluginInfo.PluginVersion)]
 [BepInDependency(Main.ModGuid)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
 public class HardHeim : BaseUnityPlugin
 {
     public const string PluginGUID = "com.valheim.hardheim";
     public const string PluginName = "HardHeim";
-    public const string PluginVersion = "0.0.4";
 
     private ConfigEntry<float> copperOreWeight;
     private ConfigEntry<float> surtlingCoreWeight;

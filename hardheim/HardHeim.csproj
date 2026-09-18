@@ -4,7 +4,7 @@
     <TargetFramework>net462</TargetFramework>
     <OutputType>Library</OutputType>
     <AssemblyName>HardHeim</AssemblyName>
-    <VersionPrefix>0.0.4</VersionPrefix>
+    <VersionPrefix>0.0.5</VersionPrefix>
     <RootNamespace>HardHeim</RootNamespace>
     <LangVersion>latest</LangVersion>
     <!--
@@ -15,6 +15,29 @@
     -->
     <MSBuildWarningsAsMessages>MSB3245;MSB3277;MSB3243</MSBuildWarningsAsMessages>
   </PropertyGroup>
+
+  <!-- Generates a compile-time constant from VersionPrefix so the plugin version lives in one place. -->
+  <Target Name="GeneratePluginVersionConstant" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <PluginVersionConstantsFile>$(IntermediateOutputPath)PluginVersion.g.cs</PluginVersionConstantsFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <PluginVersionConstantsLines Include="namespace HardHeim%3B" />
+      <PluginVersionConstantsLines Include="internal static partial class PluginInfo" />
+      <PluginVersionConstantsLines Include="{" />
+      <PluginVersionConstantsLines Include="    public const string PluginVersion = &quot;$(VersionPrefix)&quot;%3B" />
+      <PluginVersionConstantsLines Include="}" />
+    </ItemGroup>
+    <WriteLinesToFile
+      File="$(PluginVersionConstantsFile)"
+      Lines="@(PluginVersionConstantsLines)"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <Compile Include="$(PluginVersionConstantsFile)" />
+      <FileWrites Include="$(PluginVersionConstantsFile)" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="BepInEx" Version="5.4.23.5" />
