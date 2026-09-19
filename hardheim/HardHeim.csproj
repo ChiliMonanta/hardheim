@@ -4,7 +4,9 @@
     <TargetFramework>net462</TargetFramework>
     <OutputType>Library</OutputType>
     <AssemblyName>HardHeim</AssemblyName>
-    <VersionPrefix>0.0.6</VersionPrefix>
+    <VersionPrefix>0.0.0</VersionPrefix>
+    <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+    <FileVersion>$(VersionPrefix)</FileVersion>
     <RootNamespace>HardHeim</RootNamespace>
     <LangVersion>latest</LangVersion>
     <!--

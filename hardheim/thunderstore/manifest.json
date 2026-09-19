@@ -1,10 +1,10 @@
 {
     "name": "HardHeim",
-    "version_number": "0.0.6",
+    "version_number": "$HARDHEIM_VERSION",
     "website_url": "https://github.com/ChiliMonanta/hardheim",
     "description": "Death is only the beginning.",
     "dependencies": [
         "denikson-BepInExPack_Valheim-5.4.2350",
-        "ValheimModding-Jotunn-2.30.0"
+        "ValheimModding-Jotunn-2.30.1"
     ]
 }
