@@ -261,14 +261,14 @@ dotnet pack "$CONFIGURATION_MANAGER_WRAPPER_PATH/ConfigurationManager.csproj" \
 #-------------------
 echo "# Build Jotunn"
 JONTUNN_PATH="$DEPS_PATH/Jotunn"
-JOTUNN_VERSION=2.30.0
+JOTUNN_VERSION=2.30.1
 
 clean_build_files "$JONTUNN_PATH"
 
 # Jontunn has a prebuild step that requires the Mono.Cecil.dll, don't use the checked in one.
 cp .locals-packages/Mono.Cecil.dll $DEPS_PATH/Jotunn/libraries
 
-# The pinned v2.30.0 source still declares its BepInEx runtime version as 2.29.2.
+# The pinned v2.30.1 source still declares its BepInEx runtime version as 2.29.2.
 # Synchronize it with the version used for the assembly and distribution package.
 sed -i -E 's/(public const string Version = ")[^"]+/\1'"$JOTUNN_VERSION"'/' \
   "$JONTUNN_PATH/JotunnLib/Main.cs"
@@ -376,7 +376,7 @@ rm -rf dist/tmp
 echo "# Create Jotunn package"
 mkdir -p dist/tmp/BepInEx/plugins/Jotunn
 cp $DEPS_PATH/Jotunn/JotunnLib/bin/Release/net462/Jotunn.dll dist/tmp/BepInEx/plugins/Jotunn
-cat << 'EOF' > dist/tmp/BepInEx/plugins/Jotunn/manifest.json
+cat << EOF > dist/tmp/BepInEx/plugins/Jotunn/manifest.json
 {
     "name": "Jotunn",
   "version_number": "$JOTUNN_VERSION",
@@ -393,10 +393,10 @@ rm -rf dist/tmp
 echo "# Create Configuration Manager package"
 mkdir -p dist/tmp/BepInEx/plugins/ConfigurationManager
 cp $DEPS_PATH/BepInEx.ConfigurationManager-wrapper/bin/BepInEx5/ConfigurationManager.dll dist/tmp/BepInEx/plugins/ConfigurationManager
-cat << 'EOF' > dist/tmp/BepInEx/plugins/ConfigurationManager/manifest.json
+cat << EOF > dist/tmp/BepInEx/plugins/ConfigurationManager/manifest.json
 {
     "name": "ConfigurationManager",
-    "version_number": "2.30.0",
+    "version_number": "19.0",
     "website_url": "",
     "description": "Configuration Manager is a modding library for Valheim.",
     "dependencies": [

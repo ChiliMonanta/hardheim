@@ -85,7 +85,7 @@ if [ ! -d "$DEPS_PATH/Jotunn" ]; then
     echo "📦 Cloning Jotunn..."
     git -C "$DEPS_PATH" clone https://github.com/Valheim-Modding/Jotunn.git
     (cd $DEPS_PATH/Jotunn && \
-    git checkout 157085db3470291a0141355ff634c0f49b23717e) # v2.30.0
+    git checkout 2d4d875ce16c21ad8c99e99864d42e2c4821886b) # v2.30.1
     clean_build_files "$DEPS_PATH/Jotunn"
 else
     echo "✅ Jotunn already installed."
