@@ -1,10 +1,11 @@
 # HardHeim
 
-**Odin's world, just brutal.**
+**Odin's world, just brutal. Slower progression, harsher consequences, and deadly storms for those who are not prepared.**
 
-HardHeim is a Valheim difficulty mod built with BepInEx and Jötunn. It makes
-progression more demanding through heavier copper ore, a custom death penalty
-for skills, and dark crypts that require a handheld light source.
+HardHeim makes Valheim's survival harsher from the very first day. Progression
+is slower, death has greater consequences, and dangerous weather can turn the
+world itself against you. Explore dark crypts with a handheld light, manage
+your resources carefully, and prepare for storms before they find you exposed.
 
 ## Features
 - **Copper Ore Weight:** Configure the weight of copper ore on the server.

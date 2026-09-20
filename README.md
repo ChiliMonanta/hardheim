@@ -4,13 +4,12 @@ HardHeim is a Valheim mod built with BepInEx and Jötunn. Its purpose is to
 make survival more demanding by changing gameplay rules that are normally
 fixed in vanilla Valheim.
 
-The current implementation focuses on progression pacing and atmosphere:
-- Surtling Core scarcity in Burial Chambers (0 or 1 per crypt) to lengthen and intensify the early game.
-- Configurable weights for Copper Ore and Surtling Cores.
-- Custom death penalty scaling based on skill level.
-- Pitch-black dungeons and crypts requiring handheld light sources.
-- Ships take configurable damage from severe storms, but are protected in shallow water so they do not take damage while close to shore.
-- Lightning strikes players caught outdoors during thunderstorms, harder on ships than on land.
+## Built for Hardcore Players
+Valheim's official world modifiers mainly increase enemy damage and health. They
+do not change the balance of items or the pace of progression. HardHeim extends
+those settings by changing the rules around progression, survival, and the
+environment, making each stage of the game more demanding without simply
+turning every enemy into a damage sponge.
 
 Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim/p/Dudes/HardHeim/).
 
