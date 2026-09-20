@@ -1,4 +1,4 @@
-## v0.0.DEV
+## v0.0.7
 
 - **Tier 1 Weapon Balance:** Reduced the base damage of the Club to 8, Flint Knife to 8 total, Stone Axe to 9, Flint Spear to 12, and Crude Bow to 14.
 - **Runtime Weapon Configuration:** Added configurable damage values for all rebalanced early-game weapons under the `Weapon Balance` section.
