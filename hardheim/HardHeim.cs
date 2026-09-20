@@ -29,6 +29,11 @@ public class HardHeim : BaseUnityPlugin
     private ConfigEntry<float> stormShakeStrength;
     private ConfigEntry<float> stormShakeRange;
     private ConfigEntry<float> stormShallowWaterDepth;
+    private ConfigEntry<float> clubDamage;
+    private ConfigEntry<float> flintKnifeDamage;
+    private ConfigEntry<float> stoneAxeDamage;
+    private ConfigEntry<float> flintSpearDamage;
+    private ConfigEntry<float> crudeBowDamage;
     private ConfigEntry<bool> blockRaidDrops;
     internal static ConfigEntry<float> cryptSurtlingCoreChance;
     internal static ConfigEntry<bool> StormShipDamageEnabled;
@@ -67,6 +72,51 @@ public class HardHeim : BaseUnityPlugin
             new ConfigDescription(
                 "Weight of one surtling core.",
                 new AcceptableValueRange<float>(0.1f, 1000f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        clubDamage = Config.Bind(
+            "Weapon Balance",
+            "ClubDamage",
+            8f,
+            new ConfigDescription(
+                "Blunt damage dealt by the Club.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        flintKnifeDamage = Config.Bind(
+            "Weapon Balance",
+            "FlintKnifeDamage",
+            8f,
+            new ConfigDescription(
+                "Total damage dealt by the Flint Knife, split between slash and pierce.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        stoneAxeDamage = Config.Bind(
+            "Weapon Balance",
+            "StoneAxeDamage",
+            9f,
+            new ConfigDescription(
+                "Slash damage dealt by the Stone Axe.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        flintSpearDamage = Config.Bind(
+            "Weapon Balance",
+            "FlintSpearDamage",
+            12f,
+            new ConfigDescription(
+                "Pierce damage dealt by the Flint Spear.",
+                new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        crudeBowDamage = Config.Bind(
+            "Weapon Balance",
+            "CrudeBowDamage",
+            14f,
+            new ConfigDescription(
+                "Pierce damage dealt by the Crude Bow before arrow damage.",
+                new AcceptableValueRange<float>(0f, 100f),
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
         cryptSurtlingCoreChance = Config.Bind(
@@ -247,6 +297,11 @@ public class HardHeim : BaseUnityPlugin
         Logger.LogInfo($"Storm shake strength set to {StormShakeStrength.Value}.");
         Logger.LogInfo($"Storm shake range set to {StormShakeRange.Value}.");
         Logger.LogInfo($"Storm shallow water depth set to {StormShallowWaterDepth.Value}.");
+        Logger.LogInfo($"Club damage set to {clubDamage.Value}.");
+        Logger.LogInfo($"Flint Knife damage set to {flintKnifeDamage.Value}.");
+        Logger.LogInfo($"Stone Axe damage set to {stoneAxeDamage.Value}.");
+        Logger.LogInfo($"Flint Spear damage set to {flintSpearDamage.Value}.");
+        Logger.LogInfo($"Crude Bow damage set to {crudeBowDamage.Value}.");
         Logger.LogInfo($"Raid drops blocked set to {BlockRaidDrops.Value}.");
         Logger.LogInfo($"Lightning strikes enabled set to {LightningEnabled.Value}.");
         Logger.LogInfo($"Lightning land chance set to {LightningLandChance.Value}%.");
@@ -275,6 +330,48 @@ public class HardHeim : BaseUnityPlugin
         }
 
         surtlingCore.m_itemData.m_shared.m_weight = surtlingCoreWeight.Value;
+        SetWeaponBalance();
+    }
+
+    private void SetWeaponBalance()
+    {
+        SetWeaponDamage("Club", clubDamage.Value);
+        SetWeaponDamage("KnifeFlint", flintKnifeDamage.Value);
+        SetWeaponDamage("AxeStone", stoneAxeDamage.Value);
+        SetWeaponDamage("SpearFlint", flintSpearDamage.Value);
+        SetWeaponDamage("BowCrude", crudeBowDamage.Value);
+    }
+
+    private void SetWeaponDamage(string prefabName, float damage)
+    {
+        var weapon = PrefabManager.Cache.GetPrefab<ItemDrop>(prefabName);
+        if (weapon == null || weapon.m_itemData?.m_shared == null)
+        {
+            Logger.LogError($"Could not find the {prefabName} weapon prefab.");
+            return;
+        }
+
+        var damages = weapon.m_itemData.m_shared.m_damages;
+        switch (prefabName)
+        {
+            case "Club":
+                damages.m_blunt = damage;
+                break;
+            case "KnifeFlint":
+                damages.m_slash = damage / 2f;
+                damages.m_pierce = damage / 2f;
+                break;
+            case "AxeStone":
+                damages.m_slash = damage;
+                break;
+            case "SpearFlint":
+            case "BowCrude":
+                damages.m_pierce = damage;
+                break;
+        }
+
+        weapon.m_itemData.m_shared.m_damages = damages;
+        Logger.LogInfo($"{prefabName} damage set to {damage}.");
     }
 
     private void OnConfigurationSynchronized(object sender, ConfigurationSynchronizationEventArgs args)

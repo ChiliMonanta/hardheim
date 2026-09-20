@@ -23,6 +23,7 @@ Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim
 - **Storm Ship Damage:** Ships take blunt damage while wind force reaches the configured storm threshold, but are protected in shallow water so they do not take damage while close to shore.
 - **Lightning Strikes:** Players out in the open during a thunderstorm risk being struck by lightning (higher chance on a ship than on land); a struck player's health drops to 10, with a visible bolt and messages, followed by a per-player cooldown.
 - **Raid Loot Suppression:** Creatures spawned by raids do not drop loot by default, while ordinary creatures continue to drop loot normally.
+- **Weapon Balance:** Club, Flint Knife, Stone Axe, Flint Spear, and Crude Bow damage can be adjusted at runtime through the `Weapon Balance` configuration section.
 - **Server Synchronization:** Jötunn-managed server-to-client config synchronization and version enforcement.
 
 The generated BepInEx configuration can be adjusted in:
@@ -34,6 +35,7 @@ BepInEx/config/com.valheim.hardheim.cfg
 - `Storm Ship Damage -> ShallowWaterDepth`: storms do not damage ships when the seabed is close below them; this protects boats in shallow water and near shore.
 - `Lightning Strikes -> Enabled`, `LandChancePercent` (default `0.5`), `ShipChancePercent` (default `1`), `CheckIntervalSeconds` (default `130`), `CooldownSeconds` (default `120`), `ThunderstormEnvironments`: control whether, how often, and how likely lightning strikes are, and the cooldown before a player can be struck again.
 - `Raid Loot -> BlockRaidDrops` (default `true`): controls whether raid-spawned creatures are prevented from dropping loot.
+- `Weapon Balance -> ClubDamage` (default `8`), `FlintKnifeDamage` (default `8`), `StoneAxeDamage` (default `9`), `FlintSpearDamage` (default `12`), and `CrudeBowDamage` (default `14`): control the base damage of the early-game weapons.
 
 ## Architecture
 
