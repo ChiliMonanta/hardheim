@@ -346,10 +346,9 @@ echo "Doorstop Linux build: $DOORSTOP_SO"
 
 #-------------------
 echo "# Build HardHeim"
-HARDHEIM_VERSION="0.0.6"
+HARDHEIM_VERSION="0.0.0" # dev
 
 dotnet build "hardheim/HardHeim.csproj" \
-  -c Release \
   -p:VersionPrefix=$HARDHEIM_VERSION
 
 # -------------------
@@ -411,7 +410,7 @@ rm -rf dist/tmp
 
 echo "# Create Mod package"
 mkdir -p dist/tmp
-cp hardheim/bin/Release/net462/HardHeim.dll dist/tmp
+cp hardheim/bin/Debug/net462/HardHeim.dll dist/tmp
 cp hardheim/thunderstore/{CHANGELOG.md,icon.png,manifest.json,README.md} dist/tmp
 sed -i "s/\$HARDHEIM_VERSION/$HARDHEIM_VERSION/g" dist/tmp/manifest.json
 (cd dist/tmp && zip -r ../HardHeim.zip *)
