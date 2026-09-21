@@ -1,4 +1,4 @@
-## v0.0.DEV
+## v0.0.8
 
 - **Torch is a Light Source, Not a Weapon:** The Torch's primary purpose is now to light your way, not to fight — combat use is a last resort, not a strategy.
 - **Torch Recipe Cost:** Torch now costs 2 Wood and 5 Resin to craft (up from 1 Wood, 1 Resin), configurable under `Weapon Balance`.

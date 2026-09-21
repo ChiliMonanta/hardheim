@@ -18,6 +18,15 @@ For user-visible features or configuration changes, update the documentation in 
 
 Skip documentation for internal refactors, build changes, and minor fixes unless they change user-facing behavior.
 
+## Release Process
+When asked to prepare a release (e.g. "förbered release vX.Y.Z"):
+
+1.  Rename the `## v0.0.DEV` heading in `/hardheim/thunderstore/CHANGELOG.md` to `## vX.Y.Z`.
+2.  Update the default `HARDHEIM_VERSION` fallback in `/release.sh` to `X.Y.Z`.
+3.  Run `./release.sh X.Y.Z` from the repo root to build and package `dist/HardHeim.zip`.
+
+`hardheim/thunderstore/manifest.json` uses a `$HARDHEIM_VERSION` placeholder substituted by `release.sh`; do not edit its version manually.
+
 ## Copilot Efficiency Constraints
 *   Keep responses and diffs concise; avoid boilerplate and unrelated refactors.
 *   Prefer existing Jötunn and BepInEx APIs and local project patterns.

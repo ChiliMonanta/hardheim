@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-HARDHEIM_VERSION="${1:-0.0.7}"
+HARDHEIM_VERSION="${1:-0.0.8}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIST_DIR="$SCRIPT_DIR/dist"
 PACKAGE_DIR="$DIST_DIR/tmp"
