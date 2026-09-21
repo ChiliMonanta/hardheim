@@ -1,3 +1,9 @@
+## v0.0.DEV
+
+- **Torch is a Light Source, Not a Weapon:** The Torch's primary purpose is now to light your way, not to fight — combat use is a last resort, not a strategy.
+- **Torch Recipe Cost:** Torch now costs 2 Wood and 5 Resin to craft (up from 1 Wood, 1 Resin), configurable under `Weapon Balance`.
+- **Torch Combat Durability:** Torches now break after a configurable number of melee hits (default 2), in addition to their normal timed burn-out.
+
 ## v0.0.7
 
 - **Tier 1 Weapon Balance:** Reduced the base damage of the Club to 8, Flint Knife to 8 total, Stone Axe to 9, Flint Spear to 12, and Crude Bow to 14.

@@ -34,6 +34,9 @@ public class HardHeim : BaseUnityPlugin
     private ConfigEntry<float> stoneAxeDamage;
     private ConfigEntry<float> flintSpearDamage;
     private ConfigEntry<float> crudeBowDamage;
+    private ConfigEntry<int> torchWoodCost;
+    private ConfigEntry<int> torchResinCost;
+    private ConfigEntry<int> torchHitsToBreak;
     private ConfigEntry<bool> blockRaidDrops;
     internal static ConfigEntry<float> cryptSurtlingCoreChance;
     internal static ConfigEntry<bool> StormShipDamageEnabled;
@@ -117,6 +120,33 @@ public class HardHeim : BaseUnityPlugin
             new ConfigDescription(
                 "Pierce damage dealt by the Crude Bow before arrow damage.",
                 new AcceptableValueRange<float>(0f, 100f),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        torchWoodCost = Config.Bind(
+            "Weapon Balance",
+            "TorchWoodCost",
+            2,
+            new ConfigDescription(
+                "Wood required to craft a Torch.",
+                new AcceptableValueRange<int>(1, 20),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        torchResinCost = Config.Bind(
+            "Weapon Balance",
+            "TorchResinCost",
+            5,
+            new ConfigDescription(
+                "Resin required to craft a Torch.",
+                new AcceptableValueRange<int>(1, 20),
+                new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+        torchHitsToBreak = Config.Bind(
+            "Weapon Balance",
+            "TorchHitsToBreak",
+            2,
+            new ConfigDescription(
+                "Number of melee hits before a Torch breaks, in addition to its normal timed burn-out.",
+                new AcceptableValueRange<int>(1, 20),
                 new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
         cryptSurtlingCoreChance = Config.Bind(
@@ -302,6 +332,8 @@ public class HardHeim : BaseUnityPlugin
         Logger.LogInfo($"Stone Axe damage set to {stoneAxeDamage.Value}.");
         Logger.LogInfo($"Flint Spear damage set to {flintSpearDamage.Value}.");
         Logger.LogInfo($"Crude Bow damage set to {crudeBowDamage.Value}.");
+        Logger.LogInfo($"Torch recipe cost set to {torchWoodCost.Value} Wood, {torchResinCost.Value} Resin.");
+        Logger.LogInfo($"Torch hits to break set to {torchHitsToBreak.Value}.");
         Logger.LogInfo($"Raid drops blocked set to {BlockRaidDrops.Value}.");
         Logger.LogInfo($"Lightning strikes enabled set to {LightningEnabled.Value}.");
         Logger.LogInfo($"Lightning land chance set to {LightningLandChance.Value}%.");
@@ -340,6 +372,52 @@ public class HardHeim : BaseUnityPlugin
         SetWeaponDamage("AxeStone", stoneAxeDamage.Value);
         SetWeaponDamage("SpearFlint", flintSpearDamage.Value);
         SetWeaponDamage("BowCrude", crudeBowDamage.Value);
+        SetTorchRecipeCost();
+        SetTorchHitsToBreak();
+    }
+
+    private void SetTorchHitsToBreak()
+    {
+        var torch = PrefabManager.Cache.GetPrefab<ItemDrop>("Torch");
+        if (torch == null || torch.m_itemData?.m_shared == null)
+        {
+            Logger.LogError("Could not find the Torch weapon prefab.");
+            return;
+        }
+
+        var shared = torch.m_itemData.m_shared;
+        shared.m_useDurability = true;
+        shared.m_useDurabilityDrain = shared.m_maxDurability / torchHitsToBreak.Value;
+        Logger.LogInfo($"Torch hits to break set to {torchHitsToBreak.Value}.");
+    }
+
+    private void SetTorchRecipeCost()
+    {
+        var recipe = ObjectDB.instance?.m_recipes.Find(r => r.m_item != null && r.m_item.name == "Torch");
+        if (recipe == null)
+        {
+            Logger.LogError("Could not find the Torch recipe.");
+            return;
+        }
+
+        foreach (var requirement in recipe.m_resources)
+        {
+            if (requirement.m_resItem == null)
+            {
+                continue;
+            }
+
+            if (requirement.m_resItem.name == "Wood")
+            {
+                requirement.m_amount = torchWoodCost.Value;
+            }
+            else if (requirement.m_resItem.name == "Resin")
+            {
+                requirement.m_amount = torchResinCost.Value;
+            }
+        }
+
+        Logger.LogInfo($"Torch recipe cost set to {torchWoodCost.Value} Wood, {torchResinCost.Value} Resin.");
     }
 
     private void SetWeaponDamage(string prefabName, float damage)

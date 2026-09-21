@@ -30,6 +30,7 @@ your resources carefully, and prepare for storms before they find you exposed.
 	every player must have the mod installed.
 - **Storm Ship Damage:** Ships take configurable damage during severe storms, but are protected in shallow water so they do not take damage while close to shore.
 - **Weapon Balance:** Early-game weapon damage can be adjusted at runtime through the configuration.
+- **Torch Recipe & Durability:** Torch crafting cost and the number of melee hits before it breaks can be adjusted at runtime through the configuration.
 
 ## Installation
 The easiest way to install HardHeim is using a mod manager like **r2modman** or the **Thunderstore Mod Manager**. 
@@ -57,5 +58,7 @@ BepInEx/config/com.valheim.hardheim.cfg
 - `Lightning Strikes -> CooldownSeconds`: minimum time after being struck before a player can be struck again (default `120`).
 - `Lightning Strikes -> ThunderstormEnvironments`: comma-separated environment names that count as a thunderstorm (default `ThunderStorm`).
 - `Weapon Balance -> ClubDamage` (default `8`), `FlintKnifeDamage` (default `8`), `StoneAxeDamage` (default `9`), `FlintSpearDamage` (default `12`), and `CrudeBowDamage` (default `14`): control early-game weapon damage.
+- `Weapon Balance -> TorchWoodCost` (default `2`) and `TorchResinCost` (default `5`): control the crafting cost of the Torch.
+- `Weapon Balance -> TorchHitsToBreak` (default `2`): number of melee hits before a Torch breaks, in addition to its normal timed burn-out.
 
 Death penalty behavior is built in and is not currently configurable.
