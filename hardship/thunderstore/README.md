@@ -31,6 +31,7 @@ your resources carefully, and prepare for storms before they find you exposed.
 - **Storm Ship Damage:** Ships take configurable damage during severe storms, but are protected in shallow water so they do not take damage while close to shore.
 - **Weapon Balance:** Early-game weapon damage can be adjusted at runtime through the configuration.
 - **Torch Recipe & Durability:** Torch crafting cost and the number of melee hits before it breaks can be adjusted at runtime through the configuration.
+- **Early Axe Progression:** Recipes requiring Curious or Mysterious Axe Heads are removed, keeping Birch, Oak, and Ancient Trees behind later progression.
 
 ## Installation
 The easiest way to install Hardship is using a mod manager like **r2modman** or the **Thunderstore Mod Manager**. 

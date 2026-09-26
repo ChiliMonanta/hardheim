@@ -1,3 +1,7 @@
+## v0.0.DEV
+
+- Remove recipes requiring Curious or Mysterious Axe Heads to keep Birch, Oak, and Ancient Trees behind later progression.
+
 ## v0.0.9
 
 - **Mod Rename:** The mod has been renamed from HardHeim to Hardship because the name HardHeim was already in use.

@@ -345,6 +345,8 @@ public class Hardship : BaseUnityPlugin
 
     private void SetItemWeights()
     {
+        RemoveEarlyAxeRecipes();
+
         var copperOre = PrefabManager.Cache.GetPrefab<ItemDrop>("CopperOre");
         if (copperOre == null)
         {
@@ -363,6 +365,27 @@ public class Hardship : BaseUnityPlugin
 
         surtlingCore.m_itemData.m_shared.m_weight = surtlingCoreWeight.Value;
         SetWeaponBalance();
+    }
+
+    private void RemoveEarlyAxeRecipes()
+    {
+        var recipes = ObjectDB.instance?.m_recipes;
+        if (recipes == null)
+        {
+            Logger.LogError("Could not find the recipe list while removing Early Axes.");
+            return;
+        }
+
+        int removedCount = recipes.RemoveAll(recipe =>
+            recipe != null
+            && recipe.m_resources != null
+            && recipe.m_resources.Any(requirement =>
+            {
+                var itemName = requirement?.m_resItem?.m_itemData?.m_shared?.m_name;
+                return itemName == "$item_axehead1" || itemName == "$item_axehead2";
+            }));
+
+        Logger.LogInfo($"Removed {removedCount} recipes requiring Curious or Mysterious Axe Heads.");
     }
 
     private void SetWeaponBalance()

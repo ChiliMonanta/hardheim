@@ -25,6 +25,7 @@ Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim
 - **Raid Loot Suppression:** Creatures spawned by raids do not drop loot by default, while ordinary creatures continue to drop loot normally.
 - **Weapon Balance:** Club, Flint Knife, Stone Axe, Flint Spear, and Crude Bow damage can be adjusted at runtime through the `Weapon Balance` configuration section.
 - **Torch Recipe & Durability:** Torch crafting cost and the number of melee hits before it breaks can be adjusted at runtime through the `Weapon Balance` configuration section.
+- **Early Axe Progression:** Recipes requiring Curious or Mysterious Axe Heads are removed, keeping Birch, Oak, and Ancient Trees behind later progression.
 - **Server Synchronization:** Jötunn-managed server-to-client config synchronization and version enforcement.
 
 The generated BepInEx configuration can be adjusted in:
