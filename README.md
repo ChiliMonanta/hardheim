@@ -1,17 +1,17 @@
-# HardHeim
+# Hardship
 
-HardHeim is a Valheim mod built with BepInEx and Jötunn. Its purpose is to
+Hardship is a Valheim mod built with BepInEx and Jötunn. Its purpose is to
 make survival more demanding by changing gameplay rules that are normally
 fixed in vanilla Valheim.
 
 ## Built for Hardcore Players
 Valheim's official world modifiers mainly increase enemy damage and health. They
-do not change the balance of items or the pace of progression. HardHeim extends
+do not change the balance of items or the pace of progression. Hardship extends
 those settings by changing the rules around progression, survival, and the
 environment, making each stage of the game more demanding without simply
 turning every enemy into a damage sponge.
 
-Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim/p/Dudes/HardHeim/).
+Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim/p/Dudes/Hardship/).
 
 ## Current Features
 
@@ -30,7 +30,7 @@ Download and follow releases on [Thunderstore](https://thunderstore.io/c/valheim
 The generated BepInEx configuration can be adjusted in:
 
 ```text
-BepInEx/config/com.valheim.hardheim.cfg
+BepInEx/config/com.valheim.hardship.cfg
 ```
 
 - `Storm Ship Damage -> ShallowWaterDepth`: storms do not damage ships when the seabed is close below them; this protects boats in shallow water and near shore.
@@ -42,7 +42,7 @@ BepInEx/config/com.valheim.hardheim.cfg
 
 ## Architecture
 
-HardHeim is a managed .NET Framework `net462` assembly. It runs inside the
+Hardship is a managed .NET Framework `net462` assembly. It runs inside the
 Mono runtime used by the Windows version of Valheim and is loaded by BepInEx.
 The mod uses Jötunn for Valheim integration and configuration
 synchronization.
@@ -50,7 +50,7 @@ synchronization.
 The runtime dependency chain is:
 
 ```text
-HardHeim
+Hardship
 ├── BepInEx 5.4.23.5
 ├── Jötunn 2.30.1
 │   └── YamlDotNet and JotunnBuildTask dependencies
@@ -83,9 +83,9 @@ compiled into the relevant MonoMod outputs.
 ├── build.sh                 # Builds dependencies, mod, and deployment zips
 ├── setup.sh                 # Clones dependencies at pinned revisions
 ├── install-local.sh         # Installs selected zips into the local Valheim tree
-├── hardheim/
-│   ├── HardHeim.csproj      # Mod project
-│   ├── HeavyMiner.cs        # Mod implementation
+├── hardship/
+│   ├── Hardship.csproj      # Mod project
+│   ├── Hardship.cs          # Mod implementation
 │   └── thunderstore/        # Thunderstore package metadata and documentation
 ├── dependencies/            # Local source checkouts and wrapper projects
 ├── .locals-packages/        # Locally produced NuGet packages (not committed)
@@ -144,7 +144,7 @@ Initialize the pinned source dependencies:
 ```
 
 The setup script checks out the revisions documented in
-[`hardheim.spec`](hardheim.spec), including the MonoMod.Common submodule.
+[`hardship.spec`](hardship.spec), including the MonoMod.Common submodule.
 
 Build all local dependencies, the mod, Unity Doorstop, and deployment
 packages:
@@ -161,11 +161,11 @@ dist/
 ├── BepInEx-linux.zip
 ├── Jotunn.zip
 ├── ConfigurationManager.zip
-└── HardHeim.zip
+└── Hardship.zip
 ```
 
-`HardHeim.zip` contains the mod DLL and the package metadata from
-`hardheim/thunderstore/`. It does not contain the development dependency
+`Hardship.zip` contains the mod DLL and the package metadata from
+`hardship/thunderstore/`. It does not contain the development dependency
 source tree or the local Valheim assemblies.
 
 ## Local Deployment
@@ -177,10 +177,10 @@ directory. For a complete Windows test installation:
 ./install-local.sh --all-windows
 ```
 
-To install only HardHeim after rebuilding it:
+To install only Hardship after rebuilding it:
 
 ```bash
-./install-local.sh --hardheim
+./install-local.sh --hardship
 ```
 
 For a Linux test installation, use:
@@ -193,25 +193,25 @@ The intended plugin layout is:
 
 ```text
 dependencies/valheim-steam/BepInEx/plugins/
-└── HardHeim.dll
+└── Hardship.dll
 ```
 
-The `HardHeim.zip` build artifact contains `HardHeim.dll` at the zip root,
+The `Hardship.zip` build artifact contains `Hardship.dll` at the zip root,
 which is the expected Thunderstore package layout. `install-local.sh` extracts
-that package into `BepInEx/plugins/HardHeim` for local testing.
+that package into `BepInEx/plugins/Hardship` for local testing.
 
 BepInEx and Jötunn are installed as separate packages. The game installation
 and its original `valheim_Data/Managed` assemblies remain outside the release
-package and are not modified by the HardHeim deployment step.
+package and are not modified by the Hardship deployment step.
 
 ## Release Package
 
 The Thunderstore package metadata is maintained in
-`hardheim/thunderstore/manifest.json`. Its declared dependencies are:
+`hardship/thunderstore/manifest.json`. Its declared dependencies are:
 
 - `denikson-BepInExPack_Valheim-5.4.2350`
 - `ValheimModding-Jotunn-2.30.1`
 
 For end users, BepInEx must already be installed in the Valheim directory.
-Install the release package with a mod manager, or extract `HardHeim.zip` and
-place `HardHeim.dll` in `BepInEx/plugins/`.
+Install the release package with a mod manager, or extract `Hardship.zip` and
+place `Hardship.dll` in `BepInEx/plugins/`.

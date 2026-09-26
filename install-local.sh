@@ -18,7 +18,7 @@ Options:
 	--bepinex-windows           Install the Windows BepInEx package
 	--jotunn                    Install the Jotunn plugin
 	--configuration-manager     Install the Configuration Manager plugin
-	--hardheim                  Install the HardHeim mod
+	--hardship                  Install the Hardship mod
 	--all-windows               Install all packages on windows
 	--all-linux                 Install all packages on linux
 	-h, --help                  Show this help
@@ -59,20 +59,20 @@ while (($# > 0)); do
 		--configuration-manager)
 			install_package "ConfigurationManager"
 			;;
-		--hardheim)
-			install_package "HardHeim" "$VALHEIM_INSTALL/BepInEx/plugins/HardHeim"
+		--hardship)
+			install_package "Hardship" "$VALHEIM_INSTALL/BepInEx/plugins/Hardship"
 			;;
 		--all-windows)
 			install_package "BepInEx-windows"
 			install_package "Jotunn"
 			install_package "ConfigurationManager"
-			install_package "HardHeim" "$VALHEIM_INSTALL/BepInEx/plugins/HardHeim"
+			install_package "Hardship" "$VALHEIM_INSTALL/BepInEx/plugins/Hardship"
 			;;
 		--all-linux)
 			install_package "BepInEx-linux"
 			install_package "Jotunn"
 			install_package "ConfigurationManager"
-			install_package "HardHeim" "$VALHEIM_INSTALL/BepInEx/plugins/HardHeim"
+			install_package "Hardship" "$VALHEIM_INSTALL/BepInEx/plugins/Hardship"
 			;;
 		-h|--help)
 			usage

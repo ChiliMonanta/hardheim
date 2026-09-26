@@ -1,8 +1,8 @@
-# HardHeim
+# Hardship
 
 **Odin's world, just brutal. Slower progression, harsher consequences, and deadly storms for those who are not prepared.**
 
-HardHeim makes Valheim's survival harsher from the very first day. Progression
+Hardship makes Valheim's survival harsher from the very first day. Progression
 is slower, death has greater consequences, and dangerous weather can turn the
 world itself against you. Explore dark crypts with a handheld light, manage
 your resources carefully, and prepare for storms before they find you exposed.
@@ -33,18 +33,18 @@ your resources carefully, and prepare for storms before they find you exposed.
 - **Torch Recipe & Durability:** Torch crafting cost and the number of melee hits before it breaks can be adjusted at runtime through the configuration.
 
 ## Installation
-The easiest way to install HardHeim is using a mod manager like **r2modman** or the **Thunderstore Mod Manager**. 
+The easiest way to install Hardship is using a mod manager like **r2modman** or the **Thunderstore Mod Manager**. 
 
 ### Manual Installation
 1. Ensure you have **BepInEx** and **Jötunn** installed.
-2. Download the `HardHeim.zip` archive.
-3. Extract the contents and move `HardHeim.dll` into your `Valheim/BepInEx/plugins/` folder.
+2. Download the `Hardship.zip` archive.
+3. Extract the contents and move `Hardship.dll` into your `Valheim/BepInEx/plugins/` folder.
 
 ## Configuration
 After launching the game once, edit the generated configuration file:
 
 ```text
-BepInEx/config/com.valheim.hardheim.cfg
+BepInEx/config/com.valheim.Hardship.cfg
 ```
 
 - `Ore Weights -> CopperOre`: accepts `0.1` to `1000` (default `50`).

@@ -1,7 +1,7 @@
 {
-    "name": "HardHeim",
-    "version_number": "$HARDHEIM_VERSION",
-    "website_url": "https://github.com/ChiliMonanta/hardheim",
+    "name": "Hardship",
+    "version_number": "$HARDSHIP_VERSION",
+    "website_url": "https://github.com/ChiliMonanta/hardship",
     "description": "Death is only the beginning.",
     "dependencies": [
         "denikson-BepInExPack_Valheim-5.4.2350",

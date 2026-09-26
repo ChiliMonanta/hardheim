@@ -1,3 +1,7 @@
+## v0.0.9
+
+- **Mod Rename:** The mod has been renamed from HardHeim to Hardship because the name HardHeim was already in use.
+
 ## v0.0.8
 
 - **Torch is a Light Source, Not a Weapon:** The Torch's primary purpose is now to light your way, not to fight — combat use is a last resort, not a strategy.

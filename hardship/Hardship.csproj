@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
     <OutputType>Library</OutputType>
-    <AssemblyName>HardHeim</AssemblyName>
+    <AssemblyName>Hardship</AssemblyName>
     <VersionPrefix>0.0.0</VersionPrefix>
     <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <FileVersion>$(VersionPrefix)</FileVersion>
-    <RootNamespace>HardHeim</RootNamespace>
+    <RootNamespace>Hardship</RootNamespace>
     <LangVersion>latest</LangVersion>
     <!--
       Suppress internal MSBuild reference warnings:
@@ -24,7 +24,7 @@
       <PluginVersionConstantsFile>$(IntermediateOutputPath)PluginVersion.g.cs</PluginVersionConstantsFile>
     </PropertyGroup>
     <ItemGroup>
-      <PluginVersionConstantsLines Include="namespace HardHeim%3B" />
+      <PluginVersionConstantsLines Include="namespace Hardship%3B" />
       <PluginVersionConstantsLines Include="internal static partial class PluginInfo" />
       <PluginVersionConstantsLines Include="{" />
       <PluginVersionConstantsLines Include="    public const string PluginVersion = &quot;$(VersionPrefix)&quot;%3B" />

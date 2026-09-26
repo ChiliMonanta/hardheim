@@ -345,11 +345,11 @@ echo "Doorstop Windows build: $DOORSTOP_DLL"
 echo "Doorstop Linux build: $DOORSTOP_SO"
 
 #-------------------
-echo "# Build HardHeim"
-HARDHEIM_VERSION="0.0.0" # dev
+echo "# Build Hardship"
+HARDSHIP_VERSION="0.0.0" # dev
 
-dotnet build "hardheim/HardHeim.csproj" \
-  -p:VersionPrefix=$HARDHEIM_VERSION
+dotnet build "hardship/Hardship.csproj" \
+  -p:VersionPrefix=$HARDSHIP_VERSION
 
 # -------------------
 echo "# Create packages"
@@ -410,8 +410,8 @@ rm -rf dist/tmp
 
 echo "# Create Mod package"
 mkdir -p dist/tmp
-cp hardheim/bin/Debug/net462/HardHeim.dll dist/tmp
-cp hardheim/thunderstore/{CHANGELOG.md,icon.png,manifest.json,README.md} dist/tmp
-sed -i "s/\$HARDHEIM_VERSION/$HARDHEIM_VERSION/g" dist/tmp/manifest.json
-(cd dist/tmp && zip -r ../HardHeim.zip *)
+cp hardship/bin/Debug/net462/Hardship.dll dist/tmp
+cp hardship/thunderstore/{CHANGELOG.md,icon.png,manifest.json,README.md} dist/tmp
+sed -i "s/\$HARDSHIP_VERSION/$HARDSHIP_VERSION/g" dist/tmp/manifest.json
+(cd dist/tmp && zip -r ../Hardship.zip *)
 rm -rf dist/tmp

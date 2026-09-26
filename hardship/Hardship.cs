@@ -11,15 +11,15 @@ using Jotunn.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace HardHeim;
+namespace Hardship;
 
 [BepInPlugin(PluginGUID, PluginName, PluginInfo.PluginVersion)]
 [BepInDependency(Main.ModGuid)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
-public class HardHeim : BaseUnityPlugin
+public class Hardship : BaseUnityPlugin
 {
-    public const string PluginGUID = "com.valheim.hardheim";
-    public const string PluginName = "HardHeim";
+    public const string PluginGUID = "com.valheim.hardship";
+    public const string PluginName = "Hardship";
 
     private ConfigEntry<float> copperOreWeight;
     private ConfigEntry<float> surtlingCoreWeight;
@@ -479,7 +479,7 @@ public class HardHeim : BaseUnityPlugin
 
     #region Raid loot
 
-    private const string RaidSpawnZdoKey = "HardHeim_RaidSpawn";
+    private const string RaidSpawnZdoKey = "Hardship_RaidSpawn";
 
     [HarmonyPatch(typeof(MonsterAI), nameof(MonsterAI.SetEventCreature))]
     public static class RaidCreaturePatch
@@ -639,7 +639,7 @@ public class HardHeim : BaseUnityPlugin
     [HarmonyPatch]
     public static class LightningStrikePatch
     {
-        private const string RpcName = "HardHeim_LightningStrike";
+        private const string RpcName = "Hardship_LightningStrike";
 
         // Anything solid overhead counts as a roof; character-related layers are excluded so players don't shield each other.
         private static readonly int RoofRaycastMask = ~LayerMask.GetMask("Character", "character_trigger", "character_noenv", "Default_small");
@@ -658,7 +658,7 @@ public class HardHeim : BaseUnityPlugin
 
             ZRoutedRpc.instance.Register<Vector3, string>(RpcName, OnLightningStrikeRpc);
             rpcRegistered = true;
-            Jotunn.Logger.LogInfo("HardHeim: lightning RPC registered.");
+            Jotunn.Logger.LogInfo("Hardship: lightning RPC registered.");
         }
 
         [HarmonyPostfix]
@@ -728,7 +728,7 @@ public class HardHeim : BaseUnityPlugin
             player.Message(MessageHud.MessageType.Center, "Thor's wrath has struck you down!");
             player.StartCoroutine(ClearCenterMessageAfter(3f));
 
-            Jotunn.Logger.LogInfo($"HardHeim: lightning struck {player.GetPlayerName()} at {player.transform.position}, sending RPC.");
+            Jotunn.Logger.LogInfo($"Hardship: lightning struck {player.GetPlayerName()} at {player.transform.position}, sending RPC.");
             ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, RpcName, player.transform.position, player.GetPlayerName());
         }
 
@@ -741,7 +741,7 @@ public class HardHeim : BaseUnityPlugin
 
         private static void OnLightningStrikeRpc(long sender, Vector3 position, string playerName)
         {
-            Jotunn.Logger.LogInfo($"HardHeim: lightning RPC received for {playerName} at {position}.");
+            Jotunn.Logger.LogInfo($"Hardship: lightning RPC received for {playerName} at {position}.");
             SpawnLightningVisual(position);
 
             // The struck player already gets a center message locally; only notify everyone else.
@@ -754,7 +754,7 @@ public class HardHeim : BaseUnityPlugin
         // Built purely from engine primitives so the effect never depends on guessing a game asset name.
         private static void SpawnLightningVisual(Vector3 position)
         {
-            var boltObject = new GameObject("HardHeim_LightningBolt");
+            var boltObject = new GameObject("Hardship_LightningBolt");
             boltObject.transform.position = position;
 
             var flash = boltObject.AddComponent<Light>();
