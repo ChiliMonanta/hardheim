@@ -7,7 +7,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>HarmonyLib</RootNamespace>
     <AssemblyName>0Harmony20</AssemblyName>
-    <Version>2.0.0.0</Version>
+    <VersionPrefix>$(BepInExVersionPrefix)</VersionPrefix>
     <HarmonySourcePath>$(MSBuildThisFileDirectory)..\BepInEx\submodules\BepInEx.Harmony\HarmonyX2Interop</HarmonySourcePath>
   </PropertyGroup>
   <ItemGroup>

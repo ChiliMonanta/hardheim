@@ -134,6 +134,7 @@ clean_build_files "$DEPS_PATH/BepInEx"
 dotnet build "$BEPINEX_WRAPPER_PATH/BepInEx.csproj" \
   -c Release \
   -p:TargetFrameworkRootPath="$BEPINEX_FRAMEWORK_ROOT" \
+  -p:BepInExVersionPrefix=$BEPINEX_VERSION \
   -p:DefineConstants=$CECIL_DEFINES
 
 # Needed twice with different names
@@ -142,7 +143,7 @@ dotnet pack "$BEPINEX_WRAPPER_PATH/BepInEx.csproj" \
   --no-build \
   -p:TargetFrameworks=net462 \
   -p:TargetFrameworkRootPath="$BEPINEX_FRAMEWORK_ROOT" \
-  -p:VersionPrefix=$BEPINEX_VERSION \
+  -p:BepInExVersionPrefix=$BEPINEX_VERSION \
   -p:PackageOutputPath="$LOCAL_PACKAGES_PATH" \
   -p:DefineConstants=$CECIL_DEFINES \
   -p:CecilVersion=$CECIL_VERSION
@@ -152,7 +153,7 @@ dotnet pack "$BEPINEX_WRAPPER_PATH/BepInEx.csproj" \
   -p:PackageId=BepInEx.BaseLib \
   -p:TargetFrameworks=net462 \
   -p:TargetFrameworkRootPath="$BEPINEX_FRAMEWORK_ROOT" \
-  -p:VersionPrefix=$BEPINEX_VERSION \
+  -p:BepInExVersionPrefix=$BEPINEX_VERSION \
   -p:PackageOutputPath="$LOCAL_PACKAGES_PATH" \
   -p:DefineConstants=$CECIL_DEFINES \
   -p:CecilVersion=$CECIL_VERSION
@@ -179,7 +180,7 @@ dotnet pack "$BEPINEX_WRAPPER_PATH/HarmonyX2Interop.csproj" \
   -c Release \
   -p:TargetFrameworks=net462 \
   -p:TargetFrameworkRootPath="$BEPINEX_FRAMEWORK_ROOT" \
-  -p:Version=$BEPINEX_VERSION \
+  -p:BepInExVersionPrefix=$BEPINEX_VERSION \
   -p:PackageOutputPath="$LOCAL_PACKAGES_PATH" \
   -p:DefineConstants=$CECIL_DEFINES \
   -p:CecilVersion=$CECIL_VERSION
@@ -188,7 +189,7 @@ dotnet pack "$BEPINEX_WRAPPER_PATH/HarmonyXInterop.csproj" \
   -c Release \
   -p:TargetFrameworks=net462 \
   -p:TargetFrameworkRootPath="$BEPINEX_FRAMEWORK_ROOT" \
-  -p:Version=$BEPINEX_VERSION \
+  -p:BepInExVersionPrefix=$BEPINEX_VERSION \
   -p:PackageOutputPath="$LOCAL_PACKAGES_PATH" \
   -p:DefineConstants=$CECIL_DEFINES \
   -p:CecilVersion=$CECIL_VERSION
@@ -197,7 +198,7 @@ dotnet pack "$BEPINEX_WRAPPER_PATH/BepInEx.Preloader.csproj" \
   -c Release \
   -p:TargetFrameworks=net462 \
   -p:TargetFrameworkRootPath="$BEPINEX_FRAMEWORK_ROOT" \
-  -p:Version=$BEPINEX_VERSION \
+  -p:BepInExVersionPrefix=$BEPINEX_VERSION \
   -p:PackageOutputPath="$LOCAL_PACKAGES_PATH" \
   -p:DefineConstants=$CECIL_DEFINES \
   -p:CecilVersion=$CECIL_VERSION
